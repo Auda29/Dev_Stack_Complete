@@ -1,6 +1,7 @@
 # Agents Documentation
 
-This document defines the roles, responsibilities, and operational rules for all agents in the Dev_Stack multi-agent development system.
+This document defines the roles, responsibilities, and operational rules for all agents
+in the Dev_Stack multi-agent development system.
 
 ---
 
@@ -16,6 +17,7 @@ This document defines the roles, responsibilities, and operational rules for all
    - [DevOps](#devops)
 3. [Communication Protocol](#communication-protocol)
 4. [Handover Process](#handover-process)
+5. [Glossary](#glossary)
 
 ---
 
@@ -738,4 +740,16 @@ If you encounter issues:
 **Version**: 1.0  
 **Last Updated**: 2025-11-07  
 **Maintained By**: DevOps
+
+---
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Task** | A unit of work tracked in `tasks.json` with a unique ID (T-XXX). |
+| **Assignment** | The allocation of a task to a specific agent (e.g., Dev1). |
+| **Handover** | The process of passing a task from one agent to another (e.g., Dev1 → Testing). |
+| **Worktree** | A dedicated Git working directory for an agent, allowing parallel work on different branches. |
+| **Domain Boundaries** | The specific area of responsibility for an agent (e.g., Dev1 = Core, Dev2 = API/UI). |
 

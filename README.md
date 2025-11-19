@@ -1,6 +1,7 @@
 # Dev_Stack – Local Multi-Agent Development System
 
-A **fully local, containerized** development workflow where multiple AI agents collaborate in parallel without conflicts. Each agent works in isolation using **Docker containers** and **Git worktrees**.
+A **fully local, containerized** development workflow where multiple AI agents collaborate in parallel without conflicts.
+Each agent works in isolation using **Docker containers** and **Git worktrees**.
 
 ---
 
@@ -14,68 +15,6 @@ Dev_Stack enables you to orchestrate multiple specialized AI agents working toge
 - **Testing**: Writes and executes tests
 - **Review**: Performs code reviews
 - **DevOps**: Merges code and maintains CI/CD
-
-Each agent operates in its own Docker container and Git worktree, preventing conflicts and maintaining clean history.
-
----
-
-## 🏗️ Architecture
-
-```ascii
-   ┌─────────────┐     1. Chat Request
-   │    Human    ├──────────────────────────┐
-   └─────────────┘                          │
-                                            │
-                                    ┌───────▼────────┐
-                                    │   Taskmaster   │
-                                    │  (Container)   │
-                                    └───────┬────────┘
-                                            │
-                            2. Uses task_manager.py
-                                            │
-                                    ┌───────▼────────┐
-                                    │  tasks.json    │◄──┐
-                                    └───────┬────────┘   │
-                                            │            │
-                            3. Detect Change            │ 9. Update Status
-                                            │            │
-                                    ┌───────▼────────┐   │
-                                    │    Watcher     │   │
-                                    │(scripts/watcher)│   │
-                                    └───────┬────────┘   │
-                                            │            │
-                            4. Wake Up Agents           │
-                                            │            │
-        ┌──────────────────┬─────────────────▼──────────┴┐
-        │                  │                              │
-  ┌─────▼──────┐    ┌──────▼─────┐                       │
-  │    Dev1    │    │    Dev2    │                       │
-  │ (Container)│    │ (Container)│                       │
-  └─────┬──────┘    └──────┬─────┘                       │
-        │                  │                             │
-        │ 5. Work & Commit │                             │
-        │                  │                             │
-   ┌────▼──────────────────▼────────────────────────────┘
-   │                    Git Repository                    │
-   │         (Worktrees & Feature Branches)               │
-   └──────────────────────────┬──────────────────────────┘
-                              │
-                    6. Pre-Commit Hooks
-                              │
-        ┌──────────────────────┼──────────────────────┐
-        │                      │                      │
-  ┌─────▼──────┐    ┌──────────▼────────┐    ┌───────▼──────┐
-  │   Testing  │    │      Review       │    │    DevOps    │
-  │ (Container)│    │   (Container)     │    │  (Container) │
-  └─────┬──────┘    └──────────┬────────┘    └───────┬──────┘
-        │                      │                      │
-        │ 7. Test & Validate   │ 8. Review & Approve │
-        │                      │                      │
-        └──────────────────────┴──────────────────────┘
-```
-
-### Core Components
-
 
 1.  **tasks.json** (Source of Truth):
     -   All tasks and their status are stored in a structured JSON format.
@@ -191,6 +130,8 @@ To give agents a "memory" of the codebase:
 # From the host
 python scripts/embed_codebase.py
 ```
+(See [scripts/embed_codebase.py](scripts/embed_codebase.py) for implementation details)
+```
 
 
 ---
@@ -199,7 +140,14 @@ python scripts/embed_codebase.py
 
 ### 1. Planning (Human ↔ Taskmaster)
 
-You don't edit `tasks.json` manually. You chat with the **Taskmaster Agent** (in `agent_taskmaster` container).
+You generally don't edit `tasks.json` manually. Instead, use the CLI tool or chat with the **Taskmaster Agent**.
+
+**Recommended:**
+- **Chat**: "Taskmaster, create a task for login."
+- **CLI**: `python scripts/task_manager.py add ...`
+
+**Fallback:**
+- Edit `tasks.json` manually (only if tools fail).
 
 **Human**: "We need a new login page."
 **Taskmaster**: Uses `scripts/task_manager.py` to create tasks:

@@ -152,9 +152,24 @@ def main():
                                 print(f"  Assigned: {old_task['assigned']} -> {task['assigned']}")
 
                             # Trigger logic
-                            # If assigned to a specific agent (not Unassigned)
-                            if task['assigned'] in AGENT_MAPPING:
-                                notify_agent(task['assigned'], task)
+                            # Status-based routing
+                            if status_changed:
+                                new_status = task['status']
+                                if new_status == "TESTING":
+                                    notify_agent("Testing", task)
+                                elif new_status == "REVIEW":
+                                    notify_agent("Review", task)
+                                elif new_status == "APPROVED":
+                                    notify_agent("DevOps", task)
+                                elif new_status in ["TODO", "WIP"]:
+                                    # Notify the assigned dev if status moves back
+                                    if task['assigned'] in AGENT_MAPPING:
+                                        notify_agent(task['assigned'], task)
+                            
+                            # Assignment-based routing
+                            elif assigned_changed:
+                                if task['assigned'] in AGENT_MAPPING:
+                                    notify_agent(task['assigned'], task)
 
                 last_tasks = current_tasks
 

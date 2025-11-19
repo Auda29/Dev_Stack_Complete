@@ -1,5 +1,6 @@
 import json
 import sys
+from datetime import datetime
 
 # Configuration
 TASKS_JSON = "tasks.json"
@@ -96,7 +97,7 @@ def render_footer(metadata):
 
 ---
 
-**Last Updated**: {metadata.get('last_updated', '')}
+**Last Updated**: {datetime.now().strftime('%Y-%m-%d')}
 **Maintained By**: {metadata.get('maintained_by', '')}
 """
 

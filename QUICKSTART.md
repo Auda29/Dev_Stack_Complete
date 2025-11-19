@@ -13,7 +13,53 @@ git --version     # Should show Git 2.25+
 
 ---
 
-## Setup Steps
+---
+
+## 📥 Importing an Existing Project
+
+If you already have a codebase and want to enable Dev_Stack agents on it:
+
+### Option A: Apply Dev_Stack to your Repo (Recommended)
+1. Download the latest release of Dev_Stack.
+2. Copy the following files/folders into your project root:
+   - `docker/`
+   - `docs/`
+   - `scripts/`
+   - `docker-compose*.yml`
+   - `tasks.json`
+   - `.gitignore` (merge with yours)
+3. Run setup:
+   ```bash
+   bash scripts/setup_worktrees.sh
+   ```
+4. Start Docker:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
+   ```
+
+### Option B: Clone Dev_Stack and Import Code
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/your/dev_stack.git my-new-project
+   cd my-new-project
+   rm -rf .git  # Optional: Start fresh git history
+   git init     # Re-init if you removed .git
+   ```
+2. Copy your existing source code into this directory.
+3. Commit your code:
+   ```bash
+   git add .
+   git commit -m "feat: import existing codebase"
+   git branch dev
+   ```
+4. Run setup:
+   ```bash
+   bash scripts/setup_worktrees.sh
+   ```
+
+---
+
+## 🚀 Quick Start (New Project)
 
 ### 1. Initialize Git
 
@@ -234,19 +280,6 @@ git rebase --continue
 **Ready to build!** 🚀
 
 ---
-
-## What Happens Next?
-
-After setup, your typical workflow will be:
-
-1. **Start the Watcher** (in a separate terminal):
-   ```bash
-   python scripts/watcher.py
-   ```
-   This monitors `tasks.json` and automatically wakes up agents when tasks are assigned.
-
-2. **Connect to Taskmaster** (via IDE or terminal):
-   - Attach to `agent_taskmaster` container
    - Chat with the agent: "Plan a new feature for user authentication"
    - Taskmaster will create tasks and assign them to Dev1/Dev2
 
