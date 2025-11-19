@@ -1,0 +1,58 @@
+#!/bin/sh
+# Pre-commit hook for Dev_Stack
+# Checks code quality before allowing commit
+
+echo "------------------------------------------------"
+echo "🤖 Dev_Stack Auto-Inspector"
+echo "------------------------------------------------"
+
+# Detect if we are in a container or on host
+if [ -f "/.dockerenv" ]; then
+    echo "Running inside Docker container."
+else
+    echo "Running on Host machine."
+    # Optional: Check if tools exist on host, or warn user
+fi
+
+EXIT_CODE=0
+
+# 1. Python Checks (Flake8)
+# Find all staged python files
+STAGED_PY_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep ".py$")
+
+if [ -n "$STAGED_PY_FILES" ]; then
+    echo "Checking Python files..."
+    
+    if command -v flake8 >/dev/null 2>&1; then
+        # Run flake8 on staged files
+        echo "$STAGED_PY_FILES" | xargs flake8 --ignore=E501
+        if [ $? -ne 0 ]; then
+            echo "❌ Flake8 found issues!"
+            EXIT_CODE=1
+        else
+            echo "✓ Flake8 passed"
+        fi
+    else
+        echo "⚠️  flake8 not found. Skipping Python checks."
+        echo "   (Hint: Run 'pip install flake8' or rebuild docker images)"
+    fi
+fi
+
+# 2. Javascript/Typescript Checks (Placeholder)
+# STAGED_JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(js|ts|jsx|tsx)$")
+# ...
+
+# Final Decision
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "------------------------------------------------"
+    echo "❌ Commit blocked due to errors."
+    echo "   Please fix the issues above and try again."
+    echo "------------------------------------------------"
+    exit 1
+else
+    echo "------------------------------------------------"
+    echo "✓ All checks passed. Committing..."
+    echo "------------------------------------------------"
+    exit 0
+fi
+

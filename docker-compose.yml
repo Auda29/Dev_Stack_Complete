@@ -1,0 +1,30 @@
+# Docker Compose - Base Configuration
+# This file contains base services (if any) for the Dev_Stack system
+
+services:
+  # If you need shared services like databases, redis, etc., add them here
+  # Example:
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: devstack
+  #     POSTGRES_USER: devuser
+  #     POSTGRES_PASSWORD: devpass
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+
+# volumes:
+#   postgres_data:
+#   redis_data:
+
+# Note: Agent containers are defined in docker-compose.agents.yml
+# Run with: docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d

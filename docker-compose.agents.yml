@@ -1,0 +1,109 @@
+# Docker Compose - Agent Containers
+# This file defines all AI agent containers for the Dev_Stack system
+
+services:
+  # Taskmaster - Plans and orchestrates tasks
+  agent_taskmaster:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.dev
+    container_name: agent_taskmaster
+    hostname: taskmaster
+    volumes:
+      - .:/repo
+    working_dir: /repo/.worktrees/devops
+    environment:
+      - AGENT_NAME=Taskmaster
+      - AGENT_ROLE=orchestration
+    command: tail -f /dev/null
+    networks:
+      - devstack
+
+  # Dev1 - Core domain logic developer
+  agent_dev1:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.dev
+    container_name: agent_dev1
+    hostname: dev1
+    volumes:
+      - .:/repo
+    working_dir: /repo/.worktrees/dev1
+    environment:
+      - AGENT_NAME=Dev1
+      - AGENT_ROLE=core_development
+    command: tail -f /dev/null
+    networks:
+      - devstack
+
+  # Dev2 - API/Integration developer
+  agent_dev2:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.dev
+    container_name: agent_dev2
+    hostname: dev2
+    volumes:
+      - .:/repo
+    working_dir: /repo/.worktrees/dev2
+    environment:
+      - AGENT_NAME=Dev2
+      - AGENT_ROLE=integration_development
+    command: tail -f /dev/null
+    networks:
+      - devstack
+
+  # Testing - QA and test automation
+  agent_testing:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.dev
+    container_name: agent_testing
+    hostname: testing
+    volumes:
+      - .:/repo
+    working_dir: /repo/.worktrees/testing
+    environment:
+      - AGENT_NAME=Testing
+      - AGENT_ROLE=quality_assurance
+    command: tail -f /dev/null
+    networks:
+      - devstack
+
+  # Review - Code review and quality checks
+  agent_review:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.dev
+    container_name: agent_review
+    hostname: review
+    volumes:
+      - .:/repo
+    working_dir: /repo/.worktrees/review
+    environment:
+      - AGENT_NAME=Review
+      - AGENT_ROLE=code_review
+    command: tail -f /dev/null
+    networks:
+      - devstack
+
+  # DevOps - Integration, merging, CI/CD
+  agent_devops:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.dev
+    container_name: agent_devops
+    hostname: devops
+    volumes:
+      - .:/repo
+    working_dir: /repo/.worktrees/devops
+    environment:
+      - AGENT_NAME=DevOps
+      - AGENT_ROLE=integration_deployment
+    command: tail -f /dev/null
+    networks:
+      - devstack
+
+networks:
+  devstack:
+    driver: bridge
