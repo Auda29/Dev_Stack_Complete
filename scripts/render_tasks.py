@@ -14,8 +14,10 @@ def load_tasks():
 def render_header(metadata):
     return """# Tasks Documentation
 
-This document is the **source of truth** for all tasks in the Dev_Stack system.
-**NOTE:** This file is AUTO-GENERATED from `tasks.json`. Do not edit manually.
+**⚠️ IMPORTANT:** This file is AUTO-GENERATED from `tasks.json`. Do not edit manually.
+
+**Source of Truth:** `tasks.json`
+**How to edit:** Use `python scripts/task_manager.py` or edit `tasks.json` directly.
 
 ---
 

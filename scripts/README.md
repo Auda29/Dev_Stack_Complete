@@ -2,7 +2,32 @@
 
 This directory contains the "nervous system" of the Dev_Stack. These scripts are responsible for orchestration, quality control, and knowledge management.
 
-## 1. `watcher.py` (The Orchestrator)
+## 1. `task_manager.py` (The Task CLI)
+
+**Role**: Human-friendly interface to `tasks.json`.
+**When to run**: Whenever you need to create, update, or query tasks.
+
+- **Commands**:
+    - `python scripts/task_manager.py add --title "..." --assigned "Dev1" --description "..."` - Create new task
+    - `python scripts/task_manager.py update T-XXX --status WIP` - Update task status
+    - `python scripts/task_manager.py list` - Show all tasks
+    - `python scripts/task_manager.py report` - Generate markdown status report
+
+**Usage**:
+```bash
+# Create a task
+python scripts/task_manager.py add --title "Implement Login" --assigned "Dev1" --description "Add user authentication"
+
+# Update status
+python scripts/task_manager.py update T-001 --status TESTING
+
+# Get status report
+python scripts/task_manager.py report
+```
+
+**Note**: This is the preferred way to manage tasks. Editing `tasks.json` manually is error-prone.
+
+## 2. `watcher.py` (The Orchestrator)
 
 **Role**: The central event loop.
 **When to run**: Must be running constantly in a terminal window during development.
@@ -18,7 +43,7 @@ This directory contains the "nervous system" of the Dev_Stack. These scripts are
 python scripts/watcher.py
 ```
 
-## 2. `embed_codebase.py` (The Memory / RAG)
+## 3. `embed_codebase.py` (The Memory / RAG)
 
 **Role**: Indexer for the semantic search engine.
 **When to run**:
@@ -33,7 +58,7 @@ python scripts/watcher.py
 python scripts/embed_codebase.py
 ```
 
-## 3. `render_tasks.py` (The View)
+## 4. `render_tasks.py` (The View)
 
 **Role**: Template engine.
 **When to run**: Automatically run by `watcher.py`. Rarely run manually.
@@ -41,7 +66,7 @@ python scripts/embed_codebase.py
 - **Input**: `tasks.json`
 - **Output**: `docs/tasks.md` (Human-readable documentation).
 
-## 4. `git_hooks/pre-commit` (The Gatekeeper)
+## 5. `git_hooks/pre-commit` (The Gatekeeper)
 
 **Role**: Quality Assurance.
 **When to run**: Automatically runs on `git commit`.

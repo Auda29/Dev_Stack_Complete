@@ -88,21 +88,14 @@ Respond: "OK Dev1. Ready for tasks."
 
 ## First Task Example
 
-### In Taskmaster (or manually edit docs/tasks.md)
+### In Taskmaster (or using task_manager.py)
 
-```markdown
-### T-100: Create User Model
+**Option 1: Via Taskmaster Agent (Recommended)**
+Chat with the Taskmaster agent in `agent_taskmaster` container. It will use `task_manager.py` to create tasks.
 
-**Status**: TODO
-**Assigned**: Dev1
-**Priority**: High
-
-**Description**: Create a User model/entity with basic fields.
-
-**Acceptance Criteria**:
-- [ ] User has id, email, name fields
-- [ ] Basic validation
-- [ ] Documentation
+**Option 2: Via CLI**
+```bash
+python scripts/task_manager.py add --title "Create User Model" --assigned "Dev1" --priority "High" --description "Create a User model/entity with basic fields"
 ```
 
 ### In Dev1 Agent
@@ -120,7 +113,8 @@ git add .
 git commit -m "feat: add user model"
 git push origin feat/dev1
 
-# Update task status in docs/tasks.md to TESTING
+# Update task status using task_manager.py
+python scripts/task_manager.py update T-100 --status TESTING
 ```
 
 ---
@@ -218,7 +212,7 @@ git rebase --continue
 
 1. Read `/docs/agents.md` for detailed agent roles
 2. Read `/docs/decisions.md` for architecture guidelines
-3. Start assigning tasks in `/docs/tasks.md`
+3. Start assigning tasks using `python scripts/task_manager.py` or chat with Taskmaster agent
 4. Connect your IDE to agent containers
 5. Begin development!
 
