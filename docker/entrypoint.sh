@@ -67,5 +67,9 @@ echo "================================================"
 echo "Initialization complete. Ready for commands."
 echo "================================================"
 
+# Start the agent listener in the background
+echo "Starting Agent Listener..."
+python3 /usr/local/bin/agent_listener.py &
+
 # Execute the main command
 exec "$@"

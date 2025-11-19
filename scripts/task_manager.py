@@ -153,6 +153,100 @@ def generate_report(args):
     print(report)
 
 
+def generate_html_report(args):
+    data = load_tasks()
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Dev_Stack Dashboard</title>
+        <style>
+            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }}
+            .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+            h1 {{ color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }}
+            .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px; }}
+            .stat-card {{ background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #e9ecef; }}
+            .stat-value {{ font-size: 24px; font-weight: bold; color: #007bff; }}
+            .stat-label {{ color: #6c757d; font-size: 14px; }}
+            .task-list {{ width: 100%; border-collapse: collapse; }}
+            th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #eee; }}
+            th {{ background: #f8f9fa; font-weight: 600; }}
+            .status-badge {{ padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }}
+            .status-TODO {{ background: #e9ecef; color: #495057; }}
+            .status-WIP {{ background: #fff3cd; color: #856404; }}
+            .status-TESTING {{ background: #cce5ff; color: #004085; }}
+            .status-REVIEW {{ background: #d4edda; color: #155724; }}
+            .status-APPROVED {{ background: #d1ecf1; color: #0c5460; }}
+            .status-COMPLETED {{ background: #d4edda; color: #155724; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Dev_Stack Dashboard</h1>
+            <p>Last Updated: {timestamp}</p>
+            
+            <div class="stats">
+    """
+    
+    # Stats
+    by_status = {}
+    for t in data["tasks"]:
+        s = t["status"]
+        if s not in by_status:
+            by_status[s] = []
+        by_status[s].append(t)
+        
+    order = ["COMPLETED", "APPROVED", "REVIEW", "TESTING", "WIP", "TODO"]
+    for status in order:
+        count = len(by_status.get(status, []))
+        html += f"""
+            <div class="stat-card">
+                <div class="stat-value">{count}</div>
+                <div class="stat-label">{status}</div>
+            </div>
+        """
+        
+    html += """
+            </div>
+            
+            <h2>Active Tasks</h2>
+            <table class="task-list">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Assigned</th>
+                        <th>Title</th>
+                    </tr>
+                </thead>
+                <tbody>
+    """
+    
+    for t in data["tasks"]:
+        html += f"""
+            <tr>
+                <td>{t['id']}</td>
+                <td><span class="status-badge status-{t['status']}">{t['status']}</span></td>
+                <td>{t['assigned']}</td>
+                <td>{t['title']}</td>
+            </tr>
+        """
+        
+    html += """
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>
+    """
+    
+    with open("dashboard.html", "w", encoding="utf-8") as f:
+        f.write(html)
+    print("Generated dashboard.html")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Task Manager CLI for Agents")
     subparsers = parser.add_subparsers(dest="command")
@@ -177,7 +271,8 @@ def main():
     subparsers.add_parser("list", help="List all tasks")
 
     # REPORT
-    subparsers.add_parser("report", help="Generate a markdown status report")
+    report_parser = subparsers.add_parser("report", help="Generate a status report")
+    report_parser.add_argument("--html", action="store_true", help="Generate HTML dashboard")
 
     args = parser.parse_args()
 
@@ -188,7 +283,10 @@ def main():
     elif args.command == "list":
         list_tasks(args)
     elif args.command == "report":
-        generate_report(args)
+        if args.html:
+            generate_html_report(args)
+        else:
+            generate_report(args)
     else:
         parser.print_help()
 

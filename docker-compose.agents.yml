@@ -18,6 +18,8 @@ services:
     command: tail -f /dev/null
     networks:
       - devstack
+    env_file:
+      - .env
 
   # Dev1 - Core domain logic developer
   agent_dev1:
@@ -35,6 +37,8 @@ services:
     command: tail -f /dev/null
     networks:
       - devstack
+    env_file:
+      - .env
 
   # Dev2 - API/Integration developer
   agent_dev2:
@@ -52,6 +56,8 @@ services:
     command: tail -f /dev/null
     networks:
       - devstack
+    env_file:
+      - .env
 
   # Testing - QA and test automation
   agent_testing:
@@ -69,6 +75,8 @@ services:
     command: tail -f /dev/null
     networks:
       - devstack
+    env_file:
+      - .env
 
   # Review - Code review and quality checks
   agent_review:
@@ -86,6 +94,8 @@ services:
     command: tail -f /dev/null
     networks:
       - devstack
+    env_file:
+      - .env
 
   # DevOps - Integration, merging, CI/CD
   agent_devops:
@@ -103,6 +113,8 @@ services:
     command: tail -f /dev/null
     networks:
       - devstack
+    env_file:
+      - .env
 
 networks:
   devstack:

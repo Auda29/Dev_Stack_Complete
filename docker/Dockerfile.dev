@@ -61,6 +61,17 @@ WORKDIR /repo
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Create a non-root user
+RUN useradd -m -s /bin/bash devstack \
+    && chown -R devstack:devstack /repo
+
+# Copy listener script
+COPY ../scripts/agent_listener.py /usr/local/bin/agent_listener.py
+RUN chmod +x /usr/local/bin/agent_listener.py
+
+# Switch to non-root user
+USER devstack
+
 # Default command (keeps container running)
 CMD ["tail", "-f", "/dev/null"]
 
