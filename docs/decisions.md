@@ -445,13 +445,32 @@ What is the change that we're proposing and/or doing?
 
 ---
 
-## How to Propose a Decision
+### ADR-011: Event-Driven Automation & JSON Source of Truth
 
-1. Create a new ADR with status "Proposed"
-2. Discuss with team (via comments in `/repo/docs/decisions.md`)
-3. Update status to "Accepted" once agreed
-4. All agents must follow accepted ADRs
-5. Update status to "Superseded" if replaced by newer ADR
+**Date**: 2025-11-19  
+**Status**: Accepted  
+**Context**:
+The manual workflow of polling `tasks.md` was inefficient and error-prone. Agents needed to check files manually, and markdown parsing was fragile.
+
+**Decision**:
+1. **Source of Truth**: Switch to `tasks.json` for all task data.
+2. **View Layer**: `docs/tasks.md` is now auto-generated from JSON.
+3. **Automation**: A watcher service monitors `tasks.json` and triggers agent containers via Docker API when assignments change.
+4. **Context Awareness**: Integration of ChromaDB (RAG) for semantic code search.
+5. **Quality Gates**: Mandatory Git pre-commit hooks.
+
+**Consequences**:
+
+✅ Pros:
+- Immediate agent reaction time (no polling)
+- Type-safe task management (no markdown parsing errors)
+- Better context for agents (RAG)
+- Higher code quality (hooks)
+
+⚠️ Cons:
+- Requires Python/Docker setup for the watcher
+- Agents must handle JSON structure
+
 
 ---
 

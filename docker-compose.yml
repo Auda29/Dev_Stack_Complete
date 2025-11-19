@@ -22,9 +22,20 @@ services:
   #   volumes:
   #     - redis_data:/data
 
-# volumes:
-#   postgres_data:
-#   redis_data:
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: devstack_chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - devstack
 
-# Note: Agent containers are defined in docker-compose.agents.yml
-# Run with: docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
+volumes:
+  chroma_data:
+    driver: local
+
+networks:
+  devstack:
+    driver: bridge

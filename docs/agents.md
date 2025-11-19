@@ -32,7 +32,8 @@ When you start as any agent, follow these steps:
 
 2. **Read required documentation**
    - `/repo/docs/agents.md` (this file)
-   - `/repo/docs/tasks.md` (task list)
+   - `/repo/tasks.json` (task list source of truth)
+   - `/repo/docs/tasks.md` (task list view)
    - `/repo/docs/decisions.md` (architecture decisions)
 
 3. **Verify environment**
@@ -115,14 +116,14 @@ git commit -m "[type]: [description]"
 1. Break down high-level requirements into specific tasks
 2. Assign tasks to appropriate agents
 3. Define task dependencies and order
-4. Update `/repo/docs/tasks.md` with new tasks
+4. Update `/repo/tasks.json` with new tasks
 5. Monitor overall progress
 6. Escalate blockers
 
 **When you start**:
 ```
 I am Taskmaster. Reading project documentation.
-[After reading docs/tasks.md and docs/decisions.md]
+[After reading tasks.json and docs/decisions.md]
 OK Taskmaster. Current task count: X. Awaiting instructions.
 ```
 
@@ -130,38 +131,35 @@ OK Taskmaster. Current task count: X. Awaiting instructions.
 1. Receive high-level goal from human
 2. Analyze existing codebase structure
 3. Create task breakdown with IDs (T-001, T-002, etc.)
-4. Update `/repo/docs/tasks.md`
+4. Update `/repo/tasks.json`
 5. Assign first task to Dev1 or Dev2
 6. Hand over to assigned agent
 
 **Example task creation**:
-```markdown
-## T-005: Implement User Authentication
-
-**Status**: TODO  
-**Assigned**: Dev1  
-**Priority**: High  
-**Dependencies**: T-001 (Database setup)
-
-**Description**:
-Implement user authentication with password hashing.
-
-**Acceptance Criteria**:
-- User can register with email/password
-- Password is hashed before storage
-- Login returns session token
-- Invalid credentials return proper error
-
-**Technical Notes**:
-- Use bcrypt for hashing
-- Session token should be JWT
-- Add rate limiting
+```json
+{
+  "id": "T-005",
+  "title": "Implement User Authentication",
+  "status": "TODO",
+  "assigned": "Dev1",
+  "priority": "High",
+  "dependencies": ["T-001"],
+  "description": "Implement user authentication with password hashing.",
+  "acceptance_criteria": [
+    { "id": 1, "description": "User can register with email/password", "completed": false },
+    { "id": 2, "description": "Password is hashed before storage", "completed": false },
+    { "id": 3, "description": "Login returns session token", "completed": false },
+    { "id": 4, "description": "Invalid credentials return proper error", "completed": false }
+  ],
+  "technical_notes": "Use bcrypt for hashing. Session token should be JWT. Add rate limiting."
+}
 ```
 
 **What NOT to do**:
 - Don't write implementation code
 - Don't assign multiple tasks simultaneously without coordination
-- Don't change task assignments without noting it in tasks.md
+- Don't change task assignments without noting it in tasks.json
+
 
 ---
 
@@ -190,12 +188,12 @@ OK Dev1. Ready for task assignment.
 
 **Typical workflow**:
 1. Receive task assignment from Taskmaster
-2. Read task details in `/repo/docs/tasks.md`
-3. Analyze existing code structure
+2. Read task details in `/repo/tasks.json`
+3. Analyze existing code structure (use semantic search if needed: `python scripts/embed_codebase.py`)
 4. Implement the feature/fix
 5. Self-test the changes
 6. Commit with descriptive message
-7. Update task status to "ready-for-testing"
+7. Update task status to "ready-for-testing" in `tasks.json`
 8. Notify Testing agent
 
 **Example implementation checklist**:
@@ -204,8 +202,8 @@ OK Dev1. Ready for task assignment.
 - [ ] Write implementation
 - [ ] Add inline documentation
 - [ ] Test locally (manual/basic checks)
-- [ ] Commit changes
-- [ ] Update tasks.md status
+- [ ] Commit changes (hooks will run checks)
+- [ ] Update tasks.json status
 - [ ] Hand over to Testing
 
 **Code quality standards**:
@@ -691,14 +689,14 @@ Review → requests changes → Dev1/Dev2 (fix) → Testing → Review → DevOp
 
 If you encounter issues:
 1. Document the problem clearly
-2. Update task status to `⚠ BLOCKED`
-3. Note what's blocking in tasks.md
+2. Update task status to `⚠ BLOCKED` in `tasks.json`
+3. Note what's blocking in the task details
 4. Request human intervention if needed
 
 ### Agent Coordination
 
 - One task, one owner at a time (unless explicitly parallel)
-- Use task status in tasks.md as the source of truth
+- Use task status in `tasks.json` as the source of truth
 - Don't start work on tasks assigned to others
 - Update status immediately after completing work
 

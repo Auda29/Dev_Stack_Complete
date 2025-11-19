@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install common linters and formatters
-RUN pip3 install flake8 black --break-system-packages
+RUN pip3 install flake8 black chromadb --break-system-packages
 
 
 # Install Go - uncomment if needed

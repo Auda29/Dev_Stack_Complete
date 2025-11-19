@@ -12,15 +12,46 @@ This script monitors `docs/tasks.md` for changes and automatically triggers the 
 python scripts/watcher.py
 ```
 
-### How it works
+## git_hooks/
 
-1. Parses `docs/tasks.md` looking for task blocks.
-2. Detects changes in **Status** or **Assigned** fields.
-3. If a task is assigned to a known agent (e.g., Dev1, Dev2), it executes a `docker exec` command to notify the agent.
-4. Currently, it writes a notification to `/tmp/agent_notifications` inside the container.
+Contains Git hooks to enforce code quality.
 
-### Requirements
+- `pre-commit`: Checks for Python errors using `flake8`.
 
-- Python 3.6+
-- Docker (must be running and accessible)
+### Installation
 
+```bash
+bash scripts/install_hooks.sh
+```
+
+## embed_codebase.py (RAG)
+
+Indexes the codebase into a ChromaDB vector database. This allows agents to perform semantic searches on the code.
+
+### Prerequisites
+
+1. Start the ChromaDB service:
+   ```bash
+   docker compose up -d chroma
+   ```
+
+2. Install Python dependencies (if running on host):
+   ```bash
+   pip install chromadb
+   ```
+
+### Usage
+
+**From Host:**
+```bash
+# Windows PowerShell
+$env:CHROMA_HOST="localhost"; python scripts/embed_codebase.py
+
+# Linux/Mac
+CHROMA_HOST=localhost python scripts/embed_codebase.py
+```
+
+**From Agent Container:**
+```bash
+docker exec -it agent_dev1 python /repo/scripts/embed_codebase.py
+```

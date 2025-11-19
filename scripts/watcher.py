@@ -1,13 +1,15 @@
 import time
-import re
 import os
+import json
 import subprocess
 import sys
 from datetime import datetime
 
 # Configuration
-TASKS_FILE = "docs/tasks.md"
+TASKS_FILE = "tasks.json"
+RENDER_SCRIPT = "scripts/render_tasks.py"
 POLL_INTERVAL = 2  # seconds
+
 
 # Agent to Container Mapping
 AGENT_MAPPING = {
@@ -19,57 +21,38 @@ AGENT_MAPPING = {
     "DevOps": "agent_devops"
 }
 
+
 def get_file_content(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
-            return f.read()
+            return json.load(f)
     except FileNotFoundError:
         print(f"Error: File {filepath} not found.")
-        return ""
+        return None
+    except json.JSONDecodeError:
+        print(f"Error: File {filepath} contains invalid JSON.")
+        return None
+
 
 def parse_tasks(content):
     """
-    Parses the markdown content and returns a dictionary of tasks.
+    Parses the JSON content and returns a dictionary of tasks.
     Structure: { 'T-001': { 'status': 'TODO', 'assigned': 'Dev1', 'title': '...' } }
     """
     tasks = {}
-    current_task_id = None
-    
-    lines = content.split('\n')
-    
-    task_header_pattern = re.compile(r'^###\s+(T-\d+):\s+(.*)')
-    status_pattern = re.compile(r'\*\*Status\*\*:\s+(\w+)')
-    assigned_pattern = re.compile(r'\*\*Assigned\*\*:\s+(.*)')
-    
-    for line in lines:
-        line = line.strip()
-        
-        # Check for new task header
-        match = task_header_pattern.match(line)
-        if match:
-            current_task_id = match.group(1)
-            title = match.group(2)
-            tasks[current_task_id] = {
-                'id': current_task_id,
-                'title': title,
-                'status': 'UNKNOWN',
-                'assigned': 'UNKNOWN'
-            }
-            continue
-            
-        if current_task_id:
-            # Check for Status
-            status_match = status_pattern.match(line)
-            if status_match:
-                tasks[current_task_id]['status'] = status_match.group(1)
-            
-            # Check for Assigned
-            assigned_match = assigned_pattern.match(line)
-            if assigned_match:
-                # Remove trailing spaces/markdown chars if any
-                tasks[current_task_id]['assigned'] = assigned_match.group(1).strip()
-    
+    if not content or "tasks" not in content:
+        return tasks
+
+    for task in content["tasks"]:
+        tasks[task['id']] = {
+            'id': task['id'],
+            'title': task['title'],
+            'status': task['status'],
+            'assigned': task['assigned']
+        }
+
     return tasks
+
 
 def notify_agent(agent_name, task_info):
     """
@@ -81,31 +64,44 @@ def notify_agent(agent_name, task_info):
         return
 
     print(f"[*] Notifying {agent_name} ({container_name}) about task {task_info['id']}...")
-    
+
     # Construct the message
     message = f"NEW TASK ASSIGNMENT: {task_info['id']} - {task_info['title']} (Status: {task_info['status']})"
-    
+
     # Docker exec command
     # We try to write to a notification file inside the container
     # and also print to stdout which might be visible if attached
     cmd = [
-        "docker", "exec", container_name, 
-        "sh", "-c", 
+        "docker", "exec", container_name,
+        "sh", "-c",
         f"echo '{message}' >> /tmp/agent_notifications && echo '{message}'"
     ]
-    
+
     try:
         subprocess.run(cmd, check=True, capture_output=True)
         print(f"[+] Notification sent to {container_name}")
     except subprocess.CalledProcessError as e:
         print(f"[-] Failed to notify {container_name}: {e}")
 
+
+def update_markdown_view():
+    """
+    Runs the render_tasks.py script to update docs/tasks.md
+    """
+    try:
+        cmd = [sys.executable, RENDER_SCRIPT]
+        subprocess.run(cmd, check=True, capture_output=True)
+        print("[+] Updated docs/tasks.md")
+    except subprocess.CalledProcessError as e:
+        print(f"[-] Failed to update markdown view: {e}")
+
+
 def main():
     print(f"Starting Watcher for {TASKS_FILE}...")
-    
+
     last_mtime = 0
     last_tasks = {}
-    
+
     # Initial load
     if os.path.exists(TASKS_FILE):
         last_mtime = os.path.getmtime(TASKS_FILE)
@@ -118,50 +114,53 @@ def main():
     try:
         while True:
             time.sleep(POLL_INTERVAL)
-            
+
             if not os.path.exists(TASKS_FILE):
                 continue
-                
+
             current_mtime = os.path.getmtime(TASKS_FILE)
-            
+
             if current_mtime > last_mtime:
                 print(f"\n[!] Change detected at {datetime.now().strftime('%H:%M:%S')}")
                 last_mtime = current_mtime
-                
+
+                # Update Markdown View
+                update_markdown_view()
+
                 content = get_file_content(TASKS_FILE)
                 current_tasks = parse_tasks(content)
-                
+
                 # Detect changes
                 for task_id, task in current_tasks.items():
                     old_task = last_tasks.get(task_id)
-                    
+
                     if not old_task:
                         print(f"New task detected: {task_id}")
                         # Optionally notify if it's assigned immediately
                         if task['assigned'] != 'UNKNOWN' and task['assigned'] != 'Unassigned':
-                             notify_agent(task['assigned'], task)
+                            notify_agent(task['assigned'], task)
                     else:
                         # Check for relevant changes
                         status_changed = task['status'] != old_task['status']
                         assigned_changed = task['assigned'] != old_task['assigned']
-                        
+
                         if status_changed or assigned_changed:
                             print(f"Update on {task_id}:")
                             if status_changed:
                                 print(f"  Status: {old_task['status']} -> {task['status']}")
                             if assigned_changed:
                                 print(f"  Assigned: {old_task['assigned']} -> {task['assigned']}")
-                            
+
                             # Trigger logic
                             # If assigned to a specific agent (not Unassigned)
                             if task['assigned'] in AGENT_MAPPING:
                                 notify_agent(task['assigned'], task)
-                
+
                 last_tasks = current_tasks
-                
+
     except KeyboardInterrupt:
         print("\nStopping Watcher.")
 
+
 if __name__ == "__main__":
     main()
-
