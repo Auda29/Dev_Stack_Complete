@@ -85,6 +85,38 @@ def list_tasks(args):
         print(f"{t['id']:<8} {t['status']:<12} {t['assigned']:<15} {t['title']}")
 
 
+def generate_report(args):
+    data = load_tasks()
+
+    report = f"# Project Status Report - {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+
+    # By Status
+    by_status = {}
+    for t in data["tasks"]:
+        s = t["status"]
+        if s not in by_status:
+            by_status[s] = []
+        by_status[s].append(t)
+
+    order = ["COMPLETED", "APPROVED", "REVIEW", "TESTING", "WIP", "TODO", "BLOCKED"]
+
+    for status in order:
+        tasks = by_status.get(status, [])
+        if tasks:
+            report += f"## {status} ({len(tasks)})\n"
+            for t in tasks:
+                report += f"- **{t['id']}**: {t['title']} (Assigned: {t['assigned']})\n"
+            report += "\n"
+
+    # Backlog
+    if data.get("backlog"):
+        report += f"## Backlog ({len(data['backlog'])})\n"
+        for item in data["backlog"]:
+            report += f"- {item}\n"
+
+    print(report)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Task Manager CLI for Agents")
     subparsers = parser.add_subparsers(dest="command")
@@ -108,6 +140,9 @@ def main():
     # LIST
     subparsers.add_parser("list", help="List all tasks")
 
+    # REPORT
+    subparsers.add_parser("report", help="Generate a markdown status report")
+
     args = parser.parse_args()
 
     if args.command == "add":
@@ -116,6 +151,8 @@ def main():
         update_task(args)
     elif args.command == "list":
         list_tasks(args)
+    elif args.command == "report":
+        generate_report(args)
     else:
         parser.print_help()
 
