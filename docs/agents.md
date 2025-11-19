@@ -103,7 +103,19 @@ git commit -m "[type]: [description]"
 
 ---
 
-## System Prompts & Templates
+## State Transition Rules
+
+This system is a state machine. Agents MUST move tasks to specific states when handing over.
+
+| Current State | Agent Action | Next State | Next Agent |
+|---------------|--------------|------------|------------|
+| **TODO** | Dev1/Dev2 starts work | **WIP** | (Self) |
+| **WIP** | Dev1/Dev2 finishes implementation | **TESTING** | Testing |
+| **TESTING** | Testing passes all checks | **REVIEW** | Review |
+| **TESTING** | Testing fails (found bugs) | **TODO** | Dev1/Dev2 (assigned back) |
+| **REVIEW** | Review approves code | **APPROVED** | DevOps |
+| **REVIEW** | Review requests changes | **TODO** | Dev1/Dev2 (assigned back) |
+| **APPROVED** | DevOps merges to dev | **COMPLETED** | None |
 
 ### Universal Agent Prompt
 
@@ -125,9 +137,11 @@ YOUR RULES:
 2. ALWAYS update task status using `python scripts/task_manager.py update [ID] --status [STATUS]`.
 3. NEVER work outside your assigned folder/branch.
 4. COMMUNICATE concisely in the logs.
+5. FOLLOW the "State Transition Rules" in `docs/agents.md` for handovers.
 
 CURRENT STATUS:
 Run `python scripts/task_manager.py list` to find tasks assigned to you.
+Check for tasks where Status is TODO or WIP (if you are Dev) or TESTING (if you are Testing) etc.
 ```
 
 ---
