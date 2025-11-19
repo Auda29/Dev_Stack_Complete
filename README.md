@@ -254,7 +254,17 @@ docker compose -f docker-compose.yml -f docker-compose.agents.yml build --no-cac
 ### Watcher not triggering
 - Ensure `tasks.json` is valid JSON.
 - Check if Docker is running.
-- Check watcher logs.
+- Check watcher logs in `logs/watcher.err`.
+
+### Worktrees are broken
+If you see errors about "worktree already exists" or "is not a git repository":
+```bash
+# Prune stale worktree entries
+git worktree prune
+
+# Re-run setup script
+bash scripts/setup_worktrees.sh
+```
 
 ---
 

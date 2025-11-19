@@ -5,6 +5,8 @@ import os
 from datetime import datetime
 
 TASKS_FILE = "tasks.json"
+VALID_STATUSES = ["TODO", "WIP", "TESTING", "REVIEW", "APPROVED", "COMPLETED", "BLOCKED", "REJECTED"]
+VALID_AGENTS = ["Taskmaster", "Dev1", "Dev2", "Testing", "Review", "DevOps", "Unassigned"]
 
 
 def load_tasks():
@@ -20,14 +22,30 @@ def load_tasks():
 
 def save_tasks(data):
     data["metadata"]["last_updated"] = datetime.now().strftime("%Y-%m-%d")
-    with open(TASKS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2)
-    print(f"Successfully updated {TASKS_FILE}")
+    
+    # Atomic write to prevent race conditions
+    temp_file = TASKS_FILE + ".tmp"
+    try:
+        with open(temp_file, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2)
+        os.replace(temp_file, TASKS_FILE)
+        print(f"Successfully updated {TASKS_FILE}")
+    except Exception as e:
+        print(f"Error saving tasks: {e}")
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
 
 
 def generate_id(tasks):
-    # Simple auto-increment T-XXX
-    existing_ids = [int(t['id'].split('-')[1]) for t in tasks if t['id'].startswith('T-')]
+    # Find the highest existing ID to prevent collisions
+    existing_ids = []
+    for t in tasks:
+        if t['id'].startswith('T-'):
+            try:
+                existing_ids.append(int(t['id'].split('-')[1]))
+            except ValueError:
+                continue
+    
     if not existing_ids:
         next_id = 1
     else:
@@ -36,6 +54,10 @@ def generate_id(tasks):
 
 
 def add_task(args):
+    if args.assigned not in VALID_AGENTS:
+        print(f"Error: Invalid agent '{args.assigned}'. Valid agents: {', '.join(VALID_AGENTS)}")
+        sys.exit(1)
+
     data = load_tasks()
     new_id = generate_id(data["tasks"])
 
@@ -67,8 +89,14 @@ def update_task(args):
         sys.exit(1)
 
     if args.status:
+        if args.status not in VALID_STATUSES:
+            print(f"Error: Invalid status '{args.status}'. Valid statuses: {', '.join(VALID_STATUSES)}")
+            sys.exit(1)
         task["status"] = args.status
     if args.assigned:
+        if args.assigned not in VALID_AGENTS:
+            print(f"Error: Invalid agent '{args.assigned}'. Valid agents: {', '.join(VALID_AGENTS)}")
+            sys.exit(1)
         task["assigned"] = args.assigned
     if args.priority:
         task["priority"] = args.priority
@@ -98,7 +126,15 @@ def generate_report(args):
             by_status[s] = []
         by_status[s].append(t)
 
+    # Summary Table
+    report += "## Summary\n\n"
+    report += "| Status | Count |\n"
+    report += "|--------|-------|\n"
     order = ["COMPLETED", "APPROVED", "REVIEW", "TESTING", "WIP", "TODO", "BLOCKED"]
+    for status in order:
+        count = len(by_status.get(status, []))
+        report += f"| {status} | {count} |\n"
+    report += "\n"
 
     for status in order:
         tasks = by_status.get(status, [])
@@ -133,7 +169,7 @@ def main():
     # UPDATE
     update_parser = subparsers.add_parser("update", help="Update a task")
     update_parser.add_argument("id", help="Task ID (e.g. T-001)")
-    update_parser.add_argument("--status", choices=["TODO", "WIP", "TESTING", "REVIEW", "APPROVED", "COMPLETED", "BLOCKED"])
+    update_parser.add_argument("--status", choices=VALID_STATUSES)
     update_parser.add_argument("--assigned")
     update_parser.add_argument("--priority")
 

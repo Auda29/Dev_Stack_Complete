@@ -6,9 +6,17 @@ import sys
 from datetime import datetime
 
 # Configuration
-TASKS_FILE = "tasks.json"
-RENDER_SCRIPT = "scripts/render_tasks.py"
+# Configuration
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+TASKS_FILE = os.path.join(PROJECT_ROOT, "tasks.json")
+RENDER_SCRIPT = os.path.join(BASE_DIR, "render_tasks.py")
+LOG_DIR = os.path.join(PROJECT_ROOT, "logs")
 POLL_INTERVAL = 2  # seconds
+
+# Ensure log directory exists
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 
 # Agent to Container Mapping
@@ -98,6 +106,10 @@ def update_markdown_view():
 
 def main():
     print(f"Starting Watcher for {TASKS_FILE}...")
+    print(f"Logging to {LOG_DIR}")
+    
+    # Redirect stderr to file
+    sys.stderr = open(os.path.join(LOG_DIR, "watcher.err"), "a")
 
     last_mtime = 0
     last_tasks = {}
