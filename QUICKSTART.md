@@ -233,4 +233,30 @@ git rebase --continue
 
 **Ready to build!** 🚀
 
+---
+
+## What Happens Next?
+
+After setup, your typical workflow will be:
+
+1. **Start the Watcher** (in a separate terminal):
+   ```bash
+   python scripts/watcher.py
+   ```
+   This monitors `tasks.json` and automatically wakes up agents when tasks are assigned.
+
+2. **Connect to Taskmaster** (via IDE or terminal):
+   - Attach to `agent_taskmaster` container
+   - Chat with the agent: "Plan a new feature for user authentication"
+   - Taskmaster will create tasks and assign them to Dev1/Dev2
+
+3. **Agents work automatically**:
+   - Watcher detects new tasks → wakes up assigned agents
+   - Dev1/Dev2 implement → commit → update status to TESTING
+   - Testing agent validates → Review agent checks → DevOps merges
+
+4. **Monitor progress**:
+   - Use `python scripts/task_manager.py report` for status overview
+   - Check `docs/tasks.md` (auto-generated) for human-readable view
+
 For complete documentation, see [README.md](README.md)
