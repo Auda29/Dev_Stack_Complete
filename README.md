@@ -175,13 +175,34 @@ python scripts/embed_codebase.py
 
 ## 💼 Workflow
 
-1.  **Task Creation**: Add a new task to `tasks.json`.
-2.  **Orchestration**: The `watcher.py` sees the new task and notifies the assigned agent.
-3.  **Development**: The agent works in its container, committing code to its branch.
-4.  **Validation**: Git hooks block bad commits. Tests are run.
-5.  **Completion**: Agent updates `tasks.json` to `REVIEW` or `COMPLETED`.
+### 1. Planning (Human ↔ Taskmaster)
+
+You don't edit `tasks.json` manually. You chat with the **Taskmaster Agent** (in `agent_taskmaster` container).
+
+**Human**: "We need a new login page."
+**Taskmaster**: Uses `scripts/task_manager.py` to create tasks:
+- `T-001: Backend Login Logic` (assigned to Dev1)
+- `T-002: Frontend Login Form` (assigned to Dev2)
+
+### 2. Automation (Watcher)
+
+The `watcher.py` script detects the new tasks in `tasks.json`.
+- It **wakes up** the `agent_dev1` container.
+- It **wakes up** the `agent_dev2` container.
+
+### 3. Development (Dev Agents)
+
+The agents receive the notification and start working.
+- **Dev1**: Implements backend, runs tests, commits.
+- **Dev1**: Runs `python scripts/task_manager.py update T-001 --status REVIEW`.
+
+### 4. Review & Merge
+
+- **Review Agent** is triggered, checks code.
+- **DevOps Agent** is triggered, merges to `dev`.
 
 ---
+
 
 ## 🛠️ Agent Roles & Branches
 
