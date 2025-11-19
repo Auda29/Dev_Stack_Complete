@@ -1,57 +1,52 @@
 # Automation Scripts
 
-This directory contains scripts for automating the agent workflow.
+This directory contains the "nervous system" of the Dev_Stack. These scripts are responsible for orchestration, quality control, and knowledge management.
 
-## watcher.py
+## 1. `watcher.py` (The Orchestrator)
 
-This script monitors `docs/tasks.md` for changes and automatically triggers the assigned agent containers when a task status changes or a new task is assigned.
+**Role**: The central event loop.
+**When to run**: Must be running constantly in a terminal window during development.
 
-### Usage
+- **Input**: Monitors `tasks.json`.
+- **Action**:
+    - Detects changes in `status` or `assigned`.
+    - Wakes up the relevant Docker container using `docker exec`.
+    - Automatically runs `render_tasks.py` to keep the Markdown view in sync.
 
+**Usage**:
 ```bash
 python scripts/watcher.py
 ```
 
-## git_hooks/
+## 2. `embed_codebase.py` (The Memory / RAG)
 
-Contains Git hooks to enforce code quality.
+**Role**: Indexer for the semantic search engine.
+**When to run**:
+- Initially after setup.
+- Periodically when large code changes happen (e.g., after a merge to `dev`).
 
-- `pre-commit`: Checks for Python errors using `flake8`.
+- **Action**: Reads all code files, chunks them, and pushes embeddings to ChromaDB.
+- **Goal**: Allows agents to ask "Where is the login logic?" without grepping.
 
-### Installation
-
+**Usage**:
 ```bash
-bash scripts/install_hooks.sh
+python scripts/embed_codebase.py
 ```
 
-## embed_codebase.py (RAG)
+## 3. `render_tasks.py` (The View)
 
-Indexes the codebase into a ChromaDB vector database. This allows agents to perform semantic searches on the code.
+**Role**: Template engine.
+**When to run**: Automatically run by `watcher.py`. Rarely run manually.
 
-### Prerequisites
+- **Input**: `tasks.json`
+- **Output**: `docs/tasks.md` (Human-readable documentation).
 
-1. Start the ChromaDB service:
-   ```bash
-   docker compose up -d chroma
-   ```
+## 4. `git_hooks/pre-commit` (The Gatekeeper)
 
-2. Install Python dependencies (if running on host):
-   ```bash
-   pip install chromadb
-   ```
+**Role**: Quality Assurance.
+**When to run**: Automatically runs on `git commit`.
 
-### Usage
+- **Action**:
+    - Checks Python code with `flake8`.
+    - Blocks commit if errors are found.
 
-**From Host:**
-```bash
-# Windows PowerShell
-$env:CHROMA_HOST="localhost"; python scripts/embed_codebase.py
-
-# Linux/Mac
-CHROMA_HOST=localhost python scripts/embed_codebase.py
-```
-
-**From Agent Container:**
-```bash
-docker exec -it agent_dev1 python /repo/scripts/embed_codebase.py
-```

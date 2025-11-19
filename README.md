@@ -21,7 +21,40 @@ Each agent operates in its own Docker container and Git worktree, preventing con
 
 ## 🏗️ Architecture
 
+```ascii
+   ┌─────────────────┐     1. Edit JSON      ┌───────────────┐
+   │  Human / Admin  ├──────────────────────►│  tasks.json   │◄──┐
+   └─────────────────┘                       └───────┬───────┘   │
+                                                     │           │
+                                           2. Detect Change      │ 6. Update Status
+                                                     │           │
+                                           ┌─────────▼────────┐  │
+                                           │    Watcher       │  │
+                                           │ (scripts/watcher)│  │
+                                           └─────────┬────────┘  │
+                                                     │           │
+                                           3. Wake Up Agent      │
+                                                     │           │
+        ┌──────────────────┬──────────────────┬──────▼───────────┴┐
+        │                  │                  │                   │
+  ┌─────▼──────┐    ┌──────▼─────┐    ┌──────▼─────┐      ┌───────▼──────┐
+  │    Dev1    │    │    Dev2    │    │   Testing  │      │    DevOps    │
+  │ (Container)│    │ (Container)│    │ (Container)│      │  (Container) │
+  └─────┬──────┘    └──────┬─────┘    └──────┬─────┘      └───────┬──────┘
+        │                  │                 │                    │
+        │ 4. Commit        │                 │                    │
+        │                  │                 │                    │
+   ┌────▼──────────────────▼─────────────────▼────────────────────▼─────┐
+   │                           Git Repository                           │
+   │                    (Worktrees & Feature Branches)                  │
+   └──────────────────────────────────┬─────────────────────────────────┘
+                                      │
+                            5. Pre-Commit Hooks
+                             (Linting & Checks)
+```
+
 ### Core Components
+
 
 1.  **tasks.json** (Source of Truth):
     -   All tasks and their status are stored in a structured JSON format.
@@ -116,21 +149,27 @@ bash scripts/install_hooks.sh
 
 ### 5. Start System
 
-```bash
-# Start infrastructure (ChromaDB) and agents
-docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
+1. **Start Infrastructure**:
+   ```bash
+   # Starts ChromaDB and Agent Containers in background
+   docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
+   ```
 
-# Start the Watcher (in a separate terminal)
-python scripts/watcher.py
-```
+2. **Start Watcher** (in a new terminal window):
+   This script acts as the "nervous system", connecting tasks to agents.
+   ```bash
+   python scripts/watcher.py
+   ```
+   _Keep this terminal open to see automation logs._
 
-### 6. Index Code (Optional but Recommended)
+### 6. Index Code (RAG)
 
-To enable semantic search for agents:
+To give agents a "memory" of the codebase:
 ```bash
 # From the host
 python scripts/embed_codebase.py
 ```
+
 
 ---
 
