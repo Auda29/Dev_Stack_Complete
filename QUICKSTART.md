@@ -50,7 +50,7 @@ docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
 ### 4. Verify
 
 ```bash
-docker ps  # Should show 6 containers
+docker ps  # Should show 6 agent containers + 1 ChromaDB service
 ```
 
 ---

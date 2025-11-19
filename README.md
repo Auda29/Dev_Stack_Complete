@@ -37,7 +37,7 @@ Each agent operates in its own Docker container and Git worktree, preventing con
                                     │  tasks.json    │◄──┐
                                     └───────┬────────┘   │
                                             │            │
-                            3. Detect Change            │ 7. Update Status
+                            3. Detect Change            │ 9. Update Status
                                             │            │
                                     ┌───────▼────────┐   │
                                     │    Watcher     │   │
@@ -48,20 +48,30 @@ Each agent operates in its own Docker container and Git worktree, preventing con
                                             │            │
         ┌──────────────────┬─────────────────▼──────────┴┐
         │                  │                              │
-  ┌─────▼──────┐    ┌──────▼─────┐    ┌──────▼─────┐      │
-  │    Dev1    │    │    Dev2    │    │   Testing  │      │
-  │ (Container)│    │ (Container)│    │ (Container)│      │
-  └─────┬──────┘    └──────┬─────┘    └──────┬─────┘      │
-        │                  │                 │            │
-        │ 5. Work & Commit │                 │            │
-        │                  │                 │            │
-   ┌────▼──────────────────▼─────────────────▼────────────┘
-   │                    Git Repository                     │
-   │         (Worktrees & Feature Branches)                │
-   └──────────────────────────┬───────────────────────────┘
+  ┌─────▼──────┐    ┌──────▼─────┐                       │
+  │    Dev1    │    │    Dev2    │                       │
+  │ (Container)│    │ (Container)│                       │
+  └─────┬──────┘    └──────┬─────┘                       │
+        │                  │                             │
+        │ 5. Work & Commit │                             │
+        │                  │                             │
+   ┌────▼──────────────────▼────────────────────────────┘
+   │                    Git Repository                    │
+   │         (Worktrees & Feature Branches)               │
+   └──────────────────────────┬──────────────────────────┘
                               │
                     6. Pre-Commit Hooks
-                     (Linting & Checks)
+                              │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+  ┌─────▼──────┐    ┌──────────▼────────┐    ┌───────▼──────┐
+  │   Testing  │    │      Review       │    │    DevOps    │
+  │ (Container)│    │   (Container)     │    │  (Container) │
+  └─────┬──────┘    └──────────┬────────┘    └───────┬──────┘
+        │                      │                      │
+        │ 7. Test & Validate   │ 8. Review & Approve │
+        │                      │                      │
+        └──────────────────────┴──────────────────────┘
 ```
 
 ### Core Components
@@ -127,9 +137,10 @@ your-project/
 │   └── entrypoint.sh
 ├── scripts/
 │   ├── setup_worktrees.sh
-│   ├── watcher.py      # Automation service
+│   ├── task_manager.py  # Task CLI tool
+│   ├── watcher.py       # Automation service
 │   ├── embed_codebase.py # RAG indexer
-│   └── git_hooks/      # Quality checks
+│   └── git_hooks/       # Quality checks
 ├── tasks.json          # Task database
 ├── docker-compose.yml
 ├── docker-compose.agents.yml
@@ -204,13 +215,25 @@ The `watcher.py` script detects the new tasks in `tasks.json`.
 ### 3. Development (Dev Agents)
 
 The agents receive the notification and start working.
-- **Dev1**: Implements backend, runs tests, commits.
-- **Dev1**: Runs `python scripts/task_manager.py update T-001 --status REVIEW`.
+- **Dev1**: Implements backend, commits code.
+- **Dev1**: Updates status: `python scripts/task_manager.py update T-001 --status TESTING`
+- **Dev2**: Implements frontend, commits code.
+- **Dev2**: Updates status: `python scripts/task_manager.py update T-002 --status TESTING`
 
-### 4. Review & Merge
+### 4. Testing
 
-- **Review Agent** is triggered, checks code.
-- **DevOps Agent** is triggered, merges to `dev`.
+- **Watcher** detects status change to `TESTING`.
+- **Testing Agent** is triggered, writes and runs tests.
+- If tests pass: Updates to `REVIEW` status.
+- If tests fail: Updates back to `TODO` and notifies Dev1/Dev2.
+
+### 5. Review & Merge
+
+- **Review Agent** is triggered when status is `REVIEW`.
+- Reviews code quality, approves or requests changes.
+- If approved: Updates to `APPROVED` status.
+- **DevOps Agent** is triggered, merges approved code to `dev` branch.
+- Updates status to `COMPLETED`.
 
 ---
 
