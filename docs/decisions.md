@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADR)
 
-This document records all significant architectural decisions made for this project. All agents must read and follow these decisions.
+This document records all significant architectural decisions for the Dev_Stack project. All agents must read and follow these decisions.
 
 ---
 
