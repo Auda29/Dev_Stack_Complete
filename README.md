@@ -16,6 +16,50 @@ Dev_Stack enables you to orchestrate multiple specialized AI agents working toge
 - **Review**: Performs code reviews
 - **DevOps**: Merges code and maintains CI/CD
 
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    Human[👤 Human] -->|Chat| Taskmaster[🤖 Taskmaster]
+    Taskmaster -->|1. Create Task| JSON[(tasks.json)]
+    
+    subgraph Automation
+        JSON -->|2. Detect Change| Watcher[👀 Watcher Service]
+        Watcher -->|3. Wake Up| Agents
+    end
+    
+    subgraph Agents [Docker Containers]
+        Dev1[👨‍💻 Dev1]
+        Dev2[👩‍💻 Dev2]
+        Testing[🧪 Testing]
+        Review[🔍 Review]
+        DevOps[🚀 DevOps]
+    end
+    
+    Watcher -.->|Assign| Dev1
+    Watcher -.->|Assign| Dev2
+    
+    Dev1 -->|4. Commit| Git[Git Repository]
+    Dev2 -->|4. Commit| Git
+    
+    Dev1 -->|5. Status: TESTING| JSON
+    Dev2 -->|5. Status: TESTING| JSON
+    
+    Watcher -.->|Trigger| Testing
+    Testing -->|6. Test & Verify| Git
+    Testing -->|7. Status: REVIEW| JSON
+    
+    Watcher -.->|Trigger| Review
+    Review -->|8. Approve| Git
+    Review -->|9. Status: APPROVED| JSON
+    
+    Watcher -.->|Trigger| DevOps
+    DevOps -->|10. Merge to Dev| Git
+    DevOps -->|11. Status: COMPLETED| JSON
+```
+
+### Core Components
+
 1.  **tasks.json** (Source of Truth):
     -   All tasks and their status are stored in a structured JSON format.
     -   `docs/tasks.md` is auto-generated from this file for human readability.
