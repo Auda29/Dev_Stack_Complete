@@ -76,6 +76,10 @@ graph TD
 4.  **Safety Net** (Git Hooks):
     -   `pre-commit` hooks ensure that only valid code (linted, no syntax errors) is committed.
 
+5.  **Agent Automation** (`scripts/agent_listener.py`):
+    -   A reference implementation of an agent loop running inside each container.
+    -   Listens for task assignments and simulates agent activity (can be extended with LLM logic).
+
 ---
 
 ## 📋 Prerequisites
@@ -127,6 +131,7 @@ your-project/
 ├── tasks.json          # Task database
 ├── docker-compose.yml
 ├── docker-compose.agents.yml
+├── .env.example        # Environment variables template
 ├── .gitignore
 └── README.md
 ```
@@ -157,6 +162,8 @@ bash scripts/install_hooks.sh
 1. **Start Infrastructure**:
    ```bash
    # Starts ChromaDB and Agent Containers in background
+   # Make sure to copy .env.example to .env first!
+   cp .env.example .env
    docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
    ```
 
@@ -226,6 +233,26 @@ The agents receive the notification and start working.
 - If approved: Updates to `APPROVED` status.
 - **DevOps Agent** is triggered, merges approved code to `dev` branch.
 - Updates status to `COMPLETED`.
+
+---
+
+## 🔒 Security
+
+- **Non-Root Users**: All agent containers run as a non-root user (`devstack`) to prevent privilege escalation.
+- **Secrets Management**: API keys and sensitive data are managed via `.env` file (not committed to Git).
+- **Network Isolation**: Agents communicate over a private Docker bridge network.
+
+## 📊 Observability
+
+- **Dashboard**: Generate a visual status report of all tasks.
+  ```bash
+  python scripts/task_manager.py report --html
+  ```
+  Open `dashboard.html` to view the project status.
+
+## 🏗️ Architecture Decisions
+
+For details on scalability, conflict resolution, and trade-offs, see [docs/architecture_decisions.md](docs/architecture_decisions.md).
 
 ---
 
