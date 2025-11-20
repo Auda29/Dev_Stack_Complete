@@ -69,7 +69,7 @@ echo "================================================"
 
 # Start the agent listener in the background
 echo "Starting Agent Listener..."
-python3 /usr/local/bin/agent_listener.py &
+python3 /repo/scripts/agent_listener.py &
 
 # Execute the main command
 exec "$@"
