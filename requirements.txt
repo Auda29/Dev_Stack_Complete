@@ -1,0 +1,9 @@
+# Dev_Stack Host Dependencies
+# These packages are required to run utility scripts on the host machine
+# (not inside Docker containers)
+
+# RAG / Vector Database for code indexing
+chromadb>=0.4.0
+
+# Note: Other common dependencies like requests, pyyaml, etc. are typically
+# included in Python standard library or already available on most systems

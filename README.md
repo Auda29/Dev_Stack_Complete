@@ -88,12 +88,14 @@ Before starting, ensure you have:
 
 - ✅ **Docker Desktop** installed and running
 - ✅ **Git** installed (version 2.25+)
+- ✅ **Python 3.8+** installed (for host-side utility scripts)
 - ✅ An IDE that supports Docker (VS Code, Cursor, etc.)
 
 **Verify installation:**
 ```bash
 docker --version
 git --version
+python3 --version  # or 'python --version' on Windows
 ```
 
 ---
@@ -147,7 +149,23 @@ git commit -m "chore: initialize Dev_Stack"
 git branch dev
 ```
 
-### 4. Setup Worktrees
+### 4. Install Host Dependencies
+
+Install Python packages required for utility scripts:
+
+**Linux/Mac:**
+```bash
+bash scripts/setup_host.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+.\scripts\setup_host.ps1
+```
+
+This installs `pip3` (if needed) and Python packages like `chromadb` for RAG functionality.
+
+### 5. Setup Worktrees
 
 ```bash
 # On Linux/Mac/Git Bash
@@ -157,7 +175,7 @@ bash scripts/setup_worktrees.sh
 bash scripts/install_hooks.sh
 ```
 
-### 5. Start System
+### 6. Start System
 
 1. **Start Infrastructure**:
    ```bash
@@ -174,15 +192,21 @@ bash scripts/install_hooks.sh
    ```
    _Keep this terminal open to see automation logs._
 
-### 6. Index Code (RAG)
+### 7. Index Code (RAG)
 
 To give agents a "memory" of the codebase:
+
+**Linux/Mac:**
 ```bash
-# From the host
-python scripts/embed_codebase.py
+CHROMA_HOST=localhost python3 scripts/embed_codebase.py
 ```
-(See [scripts/embed_codebase.py](scripts/embed_codebase.py) for implementation details)
+
+**Windows:**
+```powershell
+$env:CHROMA_HOST="localhost"; python scripts/embed_codebase.py
 ```
+
+> **Note:** Make sure you've run `scripts/setup_host.sh` (or `.ps1` on Windows) first to install `chromadb`.
 
 
 ---

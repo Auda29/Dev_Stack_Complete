@@ -7,8 +7,9 @@ Get up and running with Dev_Stack in 5 minutes.
 ## Prerequisites
 
 ```bash
-docker --version  # Should show Docker 20.10+
-git --version     # Should show Git 2.25+
+docker --version   # Should show Docker 20.10+
+git --version      # Should show Git 2.25+
+python3 --version  # Should show Python 3.8+ (or 'python' on Windows)
 ```
 
 ---
@@ -71,7 +72,21 @@ git commit -m "chore: initialize Dev_Stack"
 git branch dev
 ```
 
-### 2. Setup Worktrees
+### 2. Install Host Dependencies
+
+Install Python packages required for utility scripts:
+
+**Linux/Mac:**
+```bash
+bash scripts/setup_host.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+.\scripts\setup_host.ps1
+```
+
+### 3. Setup Worktrees
 
 **Linux/Mac:**
 ```bash
@@ -87,13 +102,13 @@ bash scripts/setup_worktrees.sh
 docker compose -f docker-compose.yml -f docker-compose.agents.yml run --rm agent_devops bash scripts/setup_worktrees.sh
 ```
 
-### 3. Start Containers
+### 4. Start Containers
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
 ```
 
-### 4. Verify
+### 5. Verify
 
 ```bash
 docker ps  # Should show 6 agent containers + 1 ChromaDB service
