@@ -5,8 +5,8 @@ services:
   # Taskmaster - Plans and orchestrates tasks
   agent_taskmaster:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/Dockerfile.dev
     container_name: agent_taskmaster
     hostname: taskmaster
     volumes:
@@ -24,8 +24,8 @@ services:
   # Dev1 - Core domain logic developer
   agent_dev1:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/Dockerfile.dev
     container_name: agent_dev1
     hostname: dev1
     volumes:
@@ -43,8 +43,8 @@ services:
   # Dev2 - API/Integration developer
   agent_dev2:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/Dockerfile.dev
     container_name: agent_dev2
     hostname: dev2
     volumes:
@@ -62,8 +62,8 @@ services:
   # Testing - QA and test automation
   agent_testing:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/Dockerfile.dev
     container_name: agent_testing
     hostname: testing
     volumes:
@@ -81,8 +81,8 @@ services:
   # Review - Code review and quality checks
   agent_review:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/Dockerfile.dev
     container_name: agent_review
     hostname: review
     volumes:
@@ -100,8 +100,8 @@ services:
   # DevOps - Integration, merging, CI/CD
   agent_devops:
     build:
-      context: ./docker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/Dockerfile.dev
     container_name: agent_devops
     hostname: devops
     volumes:
