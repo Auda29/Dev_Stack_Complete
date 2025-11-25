@@ -1,6 +1,19 @@
 {
   "tasks": [
     {
+      "id": "T-002",
+      "title": "Create a greeting function",
+      "status": "TODO",
+      "assigned": "Dev1",
+      "priority": "Medium",
+      "created": "2025-11-25",
+      "dependencies": [],
+      "description": "Create a simple Python function in utils/greetings.py that takes a name parameter and returns a personalized greeting message",
+      "acceptance_criteria": [],
+      "technical_notes": "",
+      "files_changed": []
+    },
+    {
       "id": "T-001",
       "title": "Setup Project Structure",
       "status": "COMPLETED",
@@ -11,10 +24,26 @@
       "dependencies": [],
       "description": "Initialize the project with proper folder structure, documentation, and Docker setup.",
       "acceptance_criteria": [
-        { "id": 1, "description": "Create documentation structure", "completed": true },
-        { "id": 2, "description": "Setup Docker compose files", "completed": true },
-        { "id": 3, "description": "Initialize Git repository", "completed": true },
-        { "id": 4, "description": "Create agent configuration files", "completed": true }
+        {
+          "id": 1,
+          "description": "Create documentation structure",
+          "completed": true
+        },
+        {
+          "id": 2,
+          "description": "Setup Docker compose files",
+          "completed": true
+        },
+        {
+          "id": 3,
+          "description": "Initialize Git repository",
+          "completed": true
+        },
+        {
+          "id": 4,
+          "description": "Create agent configuration files",
+          "completed": true
+        }
       ],
       "technical_notes": "Base structure for multi-agent development system.",
       "files_changed": [
@@ -34,8 +63,7 @@
     "Add API documentation generator"
   ],
   "metadata": {
-    "last_updated": "2025-11-07",
+    "last_updated": "2025-11-25",
     "maintained_by": "Taskmaster & All Agents"
   }
 }
-

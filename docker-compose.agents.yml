@@ -16,6 +16,7 @@ services:
       - AGENT_NAME=Taskmaster
       - AGENT_ROLE=orchestration
       - PYTHONUNBUFFERED=1
+      - LLM_PROVIDER=openai
     command: python -u scripts/agent_listener.py
     networks:
       - devstack
@@ -40,6 +41,7 @@ services:
       - AGENT_NAME=Dev1
       - AGENT_ROLE=core_development
       - PYTHONUNBUFFERED=1
+      - LLM_PROVIDER=anthropic
     command: python -u scripts/agent_listener.py
     networks:
       - devstack
@@ -64,6 +66,7 @@ services:
       - AGENT_NAME=Dev2
       - AGENT_ROLE=integration_development
       - PYTHONUNBUFFERED=1
+      - LLM_PROVIDER=anthropic
     command: python -u scripts/agent_listener.py
     networks:
       - devstack
@@ -88,6 +91,7 @@ services:
       - AGENT_NAME=Testing
       - AGENT_ROLE=quality_assurance
       - PYTHONUNBUFFERED=1
+      - LLM_PROVIDER=anthropic
     command: python -u scripts/agent_listener.py
     networks:
       - devstack
@@ -112,6 +116,7 @@ services:
       - AGENT_NAME=Review
       - AGENT_ROLE=code_review
       - PYTHONUNBUFFERED=1
+      - LLM_PROVIDER=openai
     command: python -u scripts/agent_listener.py
     networks:
       - devstack
@@ -136,6 +141,7 @@ services:
       - AGENT_NAME=DevOps
       - AGENT_ROLE=integration_deployment
       - PYTHONUNBUFFERED=1
+      - LLM_PROVIDER=anthropic
     command: python -u scripts/agent_listener.py
     networks:
       - devstack

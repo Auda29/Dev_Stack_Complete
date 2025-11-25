@@ -1,299 +1,441 @@
 # Dev_Stack Quick Start Guide
 
-Get up and running with Dev_Stack in 5 minutes.
+Get your AI agents coding in **5 minutes**! ⚡
 
 ---
 
-## Prerequisites
+## ✅ Prerequisites Check
 
 ```bash
 docker --version   # Should show Docker 20.10+
 git --version      # Should show Git 2.25+
-python3 --version  # Should show Python 3.8+ (or 'python' on Windows)
+python3 --version  # Should show Python 3.8+
 ```
 
----
+**You'll also need:**
+- An API key from [OpenAI](https://platform.openai.com/api-keys) OR [Anthropic](https://console.anthropic.com/)
+- About 5-10 minutes
 
 ---
 
-## 📥 Importing an Existing Project
+## 🚀 5-Minute Setup
 
-If you already have a codebase and want to enable Dev_Stack agents on it:
-
-### Option A: Apply Dev_Stack to your Repo (Recommended)
-1. Download the latest release of Dev_Stack.
-2. Copy the following files/folders into your project root:
-   - `docker/`
-   - `docs/`
-   - `scripts/`
-   - `docker-compose*.yml`
-   git clone https://github.com/your/dev_stack.git my-new-project
-   cd my-new-project
-   rm -rf .git  # Optional: Start fresh git history
-   git init     # Re-init if you removed .git
-   ```
-2. Copy your existing source code into this directory.
-3. Commit your code:
-   ```bash
-   git add .
-   git commit -m "feat: import existing codebase"
-   git branch dev
-   ```
-4. Run setup:
-   ```bash
-   bash scripts/setup_worktrees.sh
-   ```
-
----
-
-## 🚀 Quick Start (New Project)
-
-### 1. Initialize Git
+### Step 1: Clone & Initialize (1 min)
 
 ```bash
-cd your-project
+# Clone the repository
+git clone https://github.com/your/dev_stack.git my-ai-project
+cd my-ai-project
+
+# Initialize Git
 git init
 git add .
 git commit -m "chore: initialize Dev_Stack"
 git branch dev
 ```
 
-### 2. Install Host Dependencies
-
-Install Python packages required for utility scripts:
-
-**Linux/Mac:**
-```bash
-bash scripts/setup_host.sh
-```
-
-**Windows (PowerShell):**
-```powershell
-.\scripts\setup_host.ps1
-```
-
-### 3. Setup Worktrees
-
-**Linux/Mac:**
-```bash
-bash scripts/setup_worktrees.sh
-```
-
-**Windows:**
-```bash
-# Use Git Bash
-bash scripts/setup_worktrees.sh
-
-# Or inside container
-docker compose -f docker-compose.yml -f docker-compose.agents.yml run --rm agent_devops bash scripts/setup_worktrees.sh
-```
-
-### 4. Start Containers
+### Step 2: Install Dependencies (2 min)
 
 ```bash
-# Make sure to copy .env.example to .env first!
+# Install Python packages
+pip install -r requirements.txt
+```
+
+This installs all LLM integrations, RAG support, and utilities.
+
+### Step 3: Configure API Keys (1 min)
+
+```bash
+# Create .env file
 cp .env.example .env
-# Edit .env to set your LLM_PROVIDER and API Key (e.g., OPENAI_API_KEY)
-docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
+
+# Edit .env and add your API keys
+# You need at least one of:
+# - OPENAI_API_KEY=sk-...
+# - ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-### 5. Verify
+**Example `.env`:**
+```env
+# Use Anthropic for most agents
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+
+# Use OpenAI for Taskmaster & Review
+OPENAI_API_KEY=sk-your-key-here
+OPENAI_MODEL=gpt-4o
+```
+
+### Step 4: Setup Worktrees (1 min)
 
 ```bash
-docker ps  # Should show 6 agent containers + 1 ChromaDB service
+# Create Git worktrees for each agent
+bash scripts/setup_worktrees.sh
 ```
 
----
-
-## Using an Agent
-
-### Terminal Method
+### Step 5: Start the System (30 sec)
 
 ```bash
-# Connect to agent
-docker exec -it agent_dev1 bash
-
-# Verify location
-pwd                        # /repo/.worktrees/dev1
-git branch --show-current  # feat/dev1
-```
-
-### IDE Method (VS Code/Cursor)
-
-1. Install Docker extension
-2. Right-click container → "Attach Visual Studio Code"
-3. Open AI assistant in attached window
-4. Give initial prompt:
-
-```
-You are Dev1. Read:
-- /repo/docs/agents.md
-- /repo/docs/tasks.md
-- /repo/docs/decisions.md
-
-Respond: "OK Dev1. Ready for tasks."
-```
-
----
-
-## First Task Example
-
-### In Taskmaster (or using task_manager.py)
-
-**Option 1: Via Taskmaster Agent (Recommended)**
-Chat with the Taskmaster agent in `agent_taskmaster` container. It will use `task_manager.py` to create tasks.
-
-**Option 2: Via CLI**
-```bash
-python scripts/task_manager.py add --title "Create User Model" --assigned "Dev1" --priority "High" --description "Create a User model/entity with basic fields"
-```
-
-### In Dev1 Agent
-
-```bash
-# Work on the task
-cd /repo/.worktrees/dev1
-git pull --rebase origin dev
-
-# Create your implementation
-# (your code here)
-
-# Commit
-git add .
-git commit -m "feat: add user model"
-git push origin feat/dev1
-
-# Update task status using task_manager.py
-python scripts/task_manager.py update T-100 --status TESTING
-```
-
----
-
-## Basic Git Workflow
-
-**Before starting work:**
-```bash
-git fetch origin
-git rebase origin/dev
-```
-
-**After completing work:**
-```bash
-git add .
-git commit -m "feat: descriptive message"
-git push origin <your-branch>
-```
-
-**Status markers in tasks.md:**
-- `TODO` → Ready to start
-- `WIP` → Currently working
-- `TESTING` → Ready for Testing agent
-- `REVIEW` → Ready for Review agent
-- `APPROVED` → Ready for DevOps to merge
-- `COMPLETED` → Merged to dev
-
----
-
-## Common Commands
-
-### Container Management
-```bash
-# Start all agents
+# Start ChromaDB + all 6 AI agents
 docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
 
-# Stop all agents
+# Verify all containers are running
+docker ps
+```
+
+You should see 7 containers:
+- `chroma` - Vector database
+- `agent_taskmaster` - Planning agent
+- `agent_dev1` - Core development
+- `agent_dev2` - API/UI development
+- `agent_testing` - QA agent
+- `agent_review` - Code review
+- `agent_devops` - Deployment agent
+
+---
+
+## 🎯 Your First AI-Generated Code
+
+### Create a Task
+
+```bash
+python scripts/task_manager.py add \
+  --title "Create a greeting function" \
+  --assigned "Dev1" \
+  --description "Create a Python function that takes a name and returns a personalized greeting"
+```
+
+### Watch the Magic ✨
+
+```bash
+# Watch Dev1 agent work
+docker logs -f agent_dev1
+```
+
+**You'll see:**
+```
+🔍 Searching codebase for relevant context...
+   Found 3 relevant code snippets
+🤖 Querying LLM for implementation...
+✅ LLM Response received (847 tokens)
+📝 Parsing and applying code changes...
+✅ Successfully applied 1 file changes
+   - utils/greetings.py
+```
+
+### Check the Result
+
+```bash
+cat utils/greetings.py
+```
+
+**The AI wrote this:**
+```python
+def greet(name):
+    """Return a personalized greeting."""
+    return f"Hello, {name}!"
+```
+
+🎉 **Congratulations!** Your AI agent just wrote its first code!
+
+---
+
+## 🧠 Enable RAG (Recommended)
+
+RAG (Retrieval-Augmented Generation) gives agents "memory" of your codebase:
+
+```bash
+# Index your codebase
+python scripts/embed_codebase.py
+```
+
+Now agents will search for similar code before generating new code, resulting in:
+- ✅ Consistent coding patterns
+- ✅ Reuse of existing utilities
+- ✅ Awareness of project structure
+- ✅ Better code quality
+
+---
+
+## 📚 Understanding the Workflow
+
+### 1. Task Creation
+
+```bash
+python scripts/task_manager.py add \
+  --title "Add user authentication" \
+  --assigned "Dev1" \
+  --description "Implement JWT-based login and registration"
+```
+
+### 2. Automatic Execution
+
+**Dev1 Agent** (Anthropic Claude):
+1. Queries RAG for similar auth code
+2. Builds context with relevant snippets
+3. Generates implementation using Claude
+4. Validates syntax
+5. Creates files with backups
+6. Updates status to `TESTING`
+
+**Testing Agent** (Anthropic Claude):
+1. Receives notification
+2. Generates test cases
+3. Runs tests
+4. Updates status to `REVIEW`
+
+**Review Agent** (OpenAI GPT-4o):
+1. Reviews code quality
+2. Checks security
+3. Approves or requests changes
+4. Updates status to `APPROVED`
+
+**DevOps Agent** (Anthropic Claude):
+1. Merges to dev branch
+2. Updates status to `COMPLETED`
+
+### 3. Monitor Progress
+
+```bash
+# View all tasks
+python scripts/task_manager.py list
+
+# Generate HTML dashboard
+python scripts/task_manager.py report --html
+open dashboard.html
+```
+
+---
+
+## 🛠️ Common Tasks
+
+### View Agent Logs
+
+```bash
+# Watch specific agent
+docker logs -f agent_dev1
+
+# View all agent logs
+docker compose -f docker-compose.agents.yml logs -f
+```
+
+### Restart an Agent
+
+```bash
+docker restart agent_dev1
+```
+
+### Stop Everything
+
+```bash
 docker compose -f docker-compose.yml -f docker-compose.agents.yml down
+```
 
-# View logs
+### Re-index Codebase (after major changes)
+
+```bash
+python scripts/embed_codebase.py
+```
+
+---
+
+## 🎓 Advanced: Multi-Agent Collaboration
+
+Create a complex feature that requires multiple agents:
+
+```bash
+# Taskmaster creates tasks
+python scripts/task_manager.py add \
+  --title "User Profile API" \
+  --assigned "Dev1" \
+  --description "Create User model and profile logic"
+
+python scripts/task_manager.py add \
+  --title "Profile REST Endpoints" \
+  --assigned "Dev2" \
+  --description "Create GET/PUT /api/profile endpoints"
+
+python scripts/task_manager.py add \
+  --title "Profile Tests" \
+  --assigned "Testing" \
+  --description "Test user profile functionality"
+```
+
+**Watch them collaborate:**
+```bash
+# Terminal 1: Dev1
+docker logs -f agent_dev1
+
+# Terminal 2: Dev2
+docker logs -f agent_dev2
+
+# Terminal 3: Testing
+docker logs -f agent_testing
+```
+
+---
+
+## 💡 Tips & Best Practices
+
+### 1. Write Clear Task Descriptions
+
+❌ **Bad:**
+```bash
+--description "Add login"
+```
+
+✅ **Good:**
+```bash
+--description "Implement JWT-based login with email/password. Include password hashing with bcrypt, token generation with 24h expiry, and refresh token support."
+```
+
+### 2. Use Technical Notes
+
+```bash
+python scripts/task_manager.py add \
+  --title "Add caching" \
+  --assigned "Dev1" \
+  --description "Add Redis caching for user profiles" \
+  --technical-notes "Use redis-py library. Cache TTL: 1 hour. Invalidate on profile update."
+```
+
+### 3. Monitor Token Usage
+
+Check conversation logs to see costs:
+```bash
+cat work_artifacts/contexts/T-001_Dev1_conversation.md
+```
+
+### 4. Optimize for Cost
+
+Edit `config/agent_config.yml`:
+```yaml
+dev1:
+  max_tokens: 4000      # Reduce for simpler tasks
+  temperature: 0.3      # Lower = more focused
+  rag_chunks: 5         # Fewer chunks = less context
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Agent Not Responding
+
+```bash
+# Check if API key is set
+docker exec agent_dev1 env | grep API_KEY
+
+# Check logs for errors
 docker logs agent_dev1
 
-# Restart specific agent
+# Restart agent
+docker restart agent_dev1
+```
+
+### "No relevant code found"
+
+```bash
+# ChromaDB not running
+docker ps | grep chroma
+
+# Codebase not indexed
+python scripts/embed_codebase.py
+```
+
+### "Token limit exceeded"
+
+Reduce context in `config/agent_config.yml`:
+```yaml
+dev1:
+  max_tokens: 2000
+  rag_chunks: 3
+```
+
+### Files Not Created
+
+```bash
+# Check agent logs for errors
+docker logs agent_dev1 | grep "Error"
+
+# Verify file permissions
+docker exec agent_dev1 ls -la /repo
+```
+
+---
+
+## 📖 Next Steps
+
+### Learn More
+
+1. **[README.md](README.md)** - Full documentation
+2. **[docs/llm_integration.md](docs/llm_integration.md)** - LLM integration guide
+3. **[docs/agents.md](docs/agents.md)** - Detailed agent roles
+4. **[docs/architecture_decisions.md](docs/architecture_decisions.md)** - Design decisions
+
+### Try Advanced Features
+
+1. **Custom Agent Prompts** - Edit `agent_listener.py` → `load_agent_prompt()`
+2. **Different LLM Providers** - Mix OpenAI, Anthropic, Google per agent
+3. **Agent-Specific Models** - Use GPT-4o-mini for simple tasks
+4. **Conversation Export** - Review full agent reasoning in `work_artifacts/`
+
+### Build Something Real
+
+```bash
+# Example: Build a REST API
+python scripts/task_manager.py add \
+  --title "Create FastAPI project structure" \
+  --assigned "Dev1"
+
+python scripts/task_manager.py add \
+  --title "Add CRUD endpoints for todos" \
+  --assigned "Dev2"
+
+python scripts/task_manager.py add \
+  --title "Add API tests" \
+  --assigned "Testing"
+```
+
+---
+
+## 🎯 Quick Reference
+
+### Agent Overview
+
+| Agent | LLM | Purpose |
+|-------|-----|---------|
+| Taskmaster | GPT-4o | Planning & task decomposition |
+| Dev1 | Claude | Core business logic |
+| Dev2 | Claude | APIs & integrations |
+| Testing | Claude | Test generation & QA |
+| Review | GPT-4o | Code review & security |
+| DevOps | Claude | Merging & deployment |
+
+### Essential Commands
+
+```bash
+# Task management
+python scripts/task_manager.py add --title "..." --assigned "Dev1"
+python scripts/task_manager.py list
+python scripts/task_manager.py update T-001 --status COMPLETED
+
+# Container management
+docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
+docker logs -f agent_dev1
 docker restart agent_dev1
 
-# Rebuild after Dockerfile changes
-docker compose -f docker-compose.yml -f docker-compose.agents.yml build
-```
+# RAG
+python scripts/embed_codebase.py
+python scripts/rag_client.py "search query"
 
-### Git Commands
-```bash
-# See all branches
-git branch -a
-
-# See worktrees
-git worktree list
-
-# View commit history
-git log --oneline --graph --all
-
-# Check status
-git status
+# Monitoring
+docker ps
+docker compose -f docker-compose.agents.yml logs -f
 ```
 
 ---
 
-## Troubleshooting
+**Ready to build with AI! 🚀**
 
-### Container won't start
-```bash
-docker logs agent_dev1
-docker compose -f docker-compose.yml -f docker-compose.agents.yml build --no-cache
-```
-
-### Worktree missing
-```bash
-docker exec -it agent_devops bash
-cd /repo
-bash scripts/setup_worktrees.sh
-```
-
-### Git conflicts
-```bash
-git status
-git fetch origin
-git rebase origin/dev
-# Fix conflicts in files
-git add .
-git rebase --continue
-```
-
----
-
-## Next Steps
-
-1. Read `/docs/agents.md` for detailed agent roles
-2. Read `/docs/decisions.md` for architecture guidelines
-3. Start assigning tasks using `python scripts/task_manager.py` or chat with Taskmaster agent
-4. Connect your IDE to agent containers
-5. Begin development!
-
----
-
-## Agent Quick Reference
-
-| Agent      | Container          | Branch         | Purpose           |
-|------------|--------------------|----------------|-------------------|
-| Taskmaster | agent_taskmaster   | chore/devops   | Task planning     |
-| Dev1       | agent_dev1         | feat/dev1      | Core logic        |
-| Dev2       | agent_dev2         | feat/dev2      | APIs/UI           |
-| Testing    | agent_testing      | test/testing   | QA & tests        |
-| Review     | agent_review       | review/main    | Code review       |
-| DevOps     | agent_devops       | chore/devops   | Merging & CI/CD   |
-
----
-
-**Ready to build!** 🚀
-
----
-   - Chat with the agent: "Plan a new feature for user authentication"
-   - Taskmaster will create tasks and assign them to Dev1/Dev2
-
-3. **Agents work automatically**:
-   - Watcher detects new tasks → wakes up assigned agents
-   - Dev1/Dev2 implement → commit → update status to TESTING
-   - Testing agent validates → Review agent checks → DevOps merges
-
-4. **Monitor progress**:
-   - Use `python scripts/task_manager.py report` for status overview
-   - Check `docs/tasks.md` (auto-generated) for human-readable view
-
-For complete documentation, see [README.md](README.md)
+For questions or issues, see the full [README.md](README.md) or check [docs/](docs/).

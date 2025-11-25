@@ -1,365 +1,441 @@
-# Dev_Stack – Local Multi-Agent Development System
+# Dev_Stack – Production-Ready Multi-Agent Development System
 
-> **Local multi-agent dev workflow template (Docker, Git worktrees, RAG, Cursor-friendly).**
+> **Fully integrated LLM-powered multi-agent development workflow with RAG, context management, and intelligent code generation.**
 
-A **fully local, containerized** development workflow where multiple AI agents collaborate in parallel without conflicts.
-Each agent works in isolation using **Docker containers** and **Git worktrees**.
+A **production-ready, containerized** development system where multiple specialized AI agents collaborate autonomously using real LLM providers (OpenAI, Anthropic, Google Gemini). Each agent works in isolation using **Docker containers** and **Git worktrees**, with full **RAG integration** for context-aware code generation.
 
-**Topics**: `dev-tools`, `ai-agents`, `docker`, `git-worktree`, `rag`, `cursor`, `local-llm`
+**Topics**: `ai-agents`, `llm`, `rag`, `docker`, `git-worktree`, `autonomous-coding`, `anthropic`, `openai`, `multi-agent`
 
 ---
 
 ## 🎯 Overview
 
-Dev_Stack enables you to orchestrate multiple specialized AI agents working together on a codebase:
+Dev_Stack enables you to orchestrate multiple specialized AI agents working together autonomously on your codebase:
 
-- **Taskmaster**: Plans and assigns tasks
-- **Dev1**: Implements core business logic
-- **Dev2**: Builds APIs and integrations
-- **Testing**: Writes and executes tests
-- **Review**: Performs code reviews
-- **DevOps**: Merges code and maintains CI/CD
+- **🎯 Taskmaster** (OpenAI GPT-4o): Plans and decomposes requirements into tasks
+- **👨‍💻 Dev1** (Anthropic Claude): Implements core business logic
+- **👩‍💻 Dev2** (Anthropic Claude): Builds APIs and integrations  
+- **🧪 Testing** (Anthropic Claude): Writes and executes tests
+- **🔍 Review** (OpenAI GPT-4o): Performs code reviews and security audits
+- **🚀 DevOps** (Anthropic Claude): Merges code and maintains CI/CD
+
+### ✨ What's New in v2.0
+
+- ✅ **Full LLM Integration** - Real AI agents, not simulations
+- ✅ **RAG-Powered Context** - Agents search your codebase semantically before coding
+- ✅ **Multi-Provider Support** - OpenAI, Anthropic Claude, Google Gemini
+- ✅ **Intelligent Code Generation** - Context-aware with automatic validation
+- ✅ **Conversation Management** - Multi-turn conversations with token tracking
+- ✅ **Role-Specific Prompts** - Each agent has specialized system instructions
+- ✅ **Automatic Code Formatting** - Black integration for Python files
+- ✅ **Safety Features** - Syntax validation, backups, and rollback capability
+
+---
 
 ## 🏗️ Architecture
 
 ```mermaid
 graph TD
-    Human[👤 Human] -->|Chat| Taskmaster[🤖 Taskmaster]
-    Taskmaster -->|1. Create Task| JSON[(tasks.json)]
+    Human[👤 Human] -->|Create Task| JSON[(tasks.json)]
     
-    subgraph Automation
-        JSON -->|2. Detect Change| Watcher[👀 Watcher Service]
-        Watcher -->|3. Wake Up| Agents
+    subgraph "AI Agent System"
+        JSON -->|Notify| Agents
+        
+        subgraph Agents [Docker Containers + LLM]
+            Taskmaster[🎯 Taskmaster<br/>GPT-4o]
+            Dev1[👨‍💻 Dev1<br/>Claude]
+            Dev2[👩‍💻 Dev2<br/>Claude]
+            Testing[🧪 Testing<br/>Claude]
+            Review[🔍 Review<br/>GPT-4o]
+            DevOps[🚀 DevOps<br/>Claude]
+        end
+        
+        subgraph Intelligence
+            RAG[🧠 RAG<br/>ChromaDB]
+            LLM[🤖 LLM APIs<br/>OpenAI/Anthropic]
+        end
+        
+        Agents <-->|Query Context| RAG
+        Agents <-->|Generate Code| LLM
     end
     
-    subgraph Agents [Docker Containers]
-        Dev1[👨‍💻 Dev1]
-        Dev2[👩‍💻 Dev2]
-        Testing[🧪 Testing]
-        Review[🔍 Review]
-        DevOps[🚀 DevOps]
-    end
-    
-    Watcher -.->|Assign| Dev1
-    Watcher -.->|Assign| Dev2
-    
-    Dev1 -->|4. Commit| Git[Git Repository]
-    Dev2 -->|4. Commit| Git
-    
-    Dev1 -->|5. Status: TESTING| JSON
-    Dev2 -->|5. Status: TESTING| JSON
-    
-    Watcher -.->|Trigger| Testing
-    Testing -->|6. Test & Verify| Git
-    Testing -->|7. Status: REVIEW| JSON
-    
-    Watcher -.->|Trigger| Review
-    Review -->|8. Approve| Git
-    Review -->|9. Status: APPROVED| JSON
-    
-    Watcher -.->|Trigger| DevOps
-    DevOps -->|10. Merge to Dev| Git
-    DevOps -->|11. Status: COMPLETED| JSON
+    Agents -->|Commit| Git[📦 Git Repository]
+    Agents -->|Update Status| JSON
 ```
 
 ### Core Components
 
-1.  **tasks.json** (Source of Truth):
-    -   All tasks and their status are stored in a structured JSON format.
-    -   `docs/tasks.md` is auto-generated from this file for human readability.
-    -   Agents read/write JSON to avoid parsing errors.
+1. **LLM Integration** (`scripts/llm_client.py`):
+   - Supports OpenAI, Anthropic, and Google Gemini
+   - Automatic retry with exponential backoff
+   - Token counting and budget tracking
+   - Conversation history management
 
-2.  **Watcher Service** (`scripts/watcher.py`):
-    -   Monitors `tasks.json` for changes.
-    -   Automatically wakes up agents (via Docker Exec) when a task is assigned to them or their status changes.
+2. **RAG System** (`scripts/rag_client.py`):
+   - Semantic code search via ChromaDB
+   - Automatic context injection into prompts
+   - Finds similar implementations and patterns
+   - Dependency tracking
 
-3.  **RAG Memory** (ChromaDB):
-    -   A vector database indexes the entire codebase.
-    -   Agents can perform semantic searches to understand context without reading every file.
+3. **Context Manager** (`scripts/context_manager.py`):
+   - Multi-turn conversation history
+   - Automatic token limit management
+   - Conversation persistence and export
 
-4.  **Safety Net** (Git Hooks):
-    -   `pre-commit` hooks ensure that only valid code (linted, no syntax errors) is committed.
+4. **Intelligent Code Editor** (`scripts/code_editor.py`):
+   - Parses LLM responses for code changes
+   - Syntax validation before applying
+   - Automatic backups with rollback
+   - Auto-formatting with Black
 
-5.  **Agent Automation** (`scripts/agent_listener.py`):
-    -   A reference implementation of an agent loop running inside each container.
-    -   Listens for task assignments and simulates agent activity (can be extended with LLM logic).
-
----
+5. **Agent Listener** (`scripts/agent_listener.py`):
+   - Monitors tasks and executes work
+   - Role-specific system prompts
+   - RAG-enhanced code generation
+   - Automatic status transitions
 
 ---
 
 ## 🧠 LLM Configuration
 
-Dev_Stack supports multiple LLM providers. You can configure which one to use via environment variables in `.env`.
-
 ### Supported Providers
 
-Set `LLM_PROVIDER` to one of the following:
+Configure via `.env` file:
 
-- **`openai`** (Default)
-  - Requires `OPENAI_API_KEY`
-  - Optional: `OPENAI_MODEL` (default: `gpt-4o`)
+#### OpenAI (Taskmaster & Review)
+```env
+OPENAI_API_KEY=sk-your-key-here
+OPENAI_MODEL=gpt-4o
+```
 
-- **`anthropic`**
-  - Requires `ANTHROPIC_API_KEY`
-  - Optional: `ANTHROPIC_MODEL` (default: `claude-3-5-sonnet-20240620`)
+#### Anthropic (Dev1, Dev2, Testing, DevOps)
+```env
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+```
 
-- **`google`**
-  - Requires `GOOGLE_API_KEY`
-  - Optional: `GOOGLE_MODEL` (default: `gemini-1.5-pro`)
+#### Google Gemini (Optional)
+```env
+GOOGLE_API_KEY=your-key-here
+GOOGLE_MODEL=gemini-1.5-pro
+```
+
+### Per-Agent Provider Override
+
+Each agent can use a different LLM provider. This is configured in `docker-compose.agents.yml`:
+
+```yaml
+agent_taskmaster:
+  environment:
+    - LLM_PROVIDER=openai  # Uses GPT-4o
+
+agent_dev1:
+  environment:
+    - LLM_PROVIDER=anthropic  # Uses Claude
+```
 
 ---
 
 ## 📋 Prerequisites
 
-Before starting, ensure you have:
-
 - ✅ **Docker Desktop** installed and running
 - ✅ **Git** installed (version 2.25+)
-- ✅ **Python 3.8+** installed (for host-side utility scripts)
+- ✅ **Python 3.8+** installed
+- ✅ **LLM API Key** (OpenAI, Anthropic, or Google)
 
-### 1. Clone or Create Your Project
+---
+
+## 🚀 Quick Start
+
+### 1. Clone and Initialize
 
 ```bash
-# If starting fresh
-mkdir my-devstack-project
-cd my-devstack-project
+git clone https://github.com/your/dev_stack.git my-project
+cd my-project
 git init
-```
-
-### 2. Copy Dev_Stack Files
-
-Copy all files from this repository into your project:
-
-```
-your-project/
-├── docs/
-│   ├── agents.md       # Agent roles and responsibilities
-│   ├── tasks.md        # Task tracking (auto-generated)
-│   └── decisions.md    # Architecture decisions
-├── docker/
-│   ├── Dockerfile.dev
-│   └── entrypoint.sh
-├── scripts/
-│   ├── setup_worktrees.sh
-│   ├── task_manager.py  # Task CLI tool
-│   ├── watcher.py       # Automation service
-│   ├── embed_codebase.py # RAG indexer
-│   └── git_hooks/       # Quality checks
-├── tasks.json          # Task database
-├── docker-compose.yml
-├── docker-compose.agents.yml
-├── .env.example        # Environment variables template
-├── .gitignore
-└── README.md
-```
-
-### 3. Initialize Git Repository
-
-```bash
-# Create initial commit
 git add .
 git commit -m "chore: initialize Dev_Stack"
-
-# Create dev branch
 git branch dev
 ```
 
-### 4. Install Host Dependencies
-
-Install Python packages required for utility scripts:
-
-**Linux/Mac:**
-```bash
-bash scripts/setup_host.sh
-```
-
-**Windows (PowerShell):**
-```powershell
-.\scripts\setup_host.ps1
-```
-
-This installs `pip3` (if needed) and Python packages like `chromadb` for RAG functionality.
-
-### 5. Setup Worktrees
+### 2. Install Dependencies
 
 ```bash
-# On Linux/Mac/Git Bash
+pip install -r requirements.txt
+```
+
+This installs:
+- `chromadb` - Vector database for RAG
+- `openai` / `anthropic` / `google-generativeai` - LLM providers
+- `tiktoken` - Token counting
+- `tenacity` - Retry logic
+- `black` - Code formatting
+- And more...
+
+### 3. Configure API Keys
+
+```bash
+cp .env.example .env
+# Edit .env and add your API keys
+```
+
+**Required:**
+- `OPENAI_API_KEY` - For Taskmaster and Review agents
+- `ANTHROPIC_API_KEY` - For Dev1, Dev2, Testing, DevOps agents
+
+### 4. Setup Worktrees
+
+```bash
 bash scripts/setup_worktrees.sh
-
-# Install Git Hooks
-bash scripts/install_hooks.sh
 ```
 
-### 6. Start System
-
-1. **Start Infrastructure**:
-   ```bash
-   # Starts ChromaDB and Agent Containers in background
-   # Make sure to copy .env.example to .env first!
-   cp .env.example .env
-   docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
-   ```
-
-2. **Start Watcher** (in a new terminal window):
-   This script acts as the "nervous system", connecting tasks to agents.
-   ```bash
-   python scripts/watcher.py
-   ```
-   _Keep this terminal open to see automation logs._
-
-### 7. Index Code (RAG)
-
-To give agents a "memory" of the codebase:
-
-**Linux/Mac:**
-```bash
-CHROMA_HOST=localhost python3 scripts/embed_codebase.py
-```
-
-**Windows:**
-```powershell
-$env:CHROMA_HOST="localhost"; python scripts/embed_codebase.py
-```
-
-> **Note:** Make sure you've run `scripts/setup_host.sh` (or `.ps1` on Windows) first to install `chromadb`.
-
----
-
-## 🎓 Try It Out: Example Project
-
-Want to see the system in action? Run the example project seeder:
+### 5. Start Infrastructure
 
 ```bash
-python scripts/create_example_project.py
+# Start ChromaDB and all agents
+docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
 ```
 
-This creates a simple **Todo App** with tasks for:
-- **DevOps**: Project setup
-- **Dev1**: Backend API
-- **Dev2**: Frontend UI
+### 6. Index Your Codebase (RAG)
 
-Once seeded, the agents (if configured with API keys) will automatically start working on these tasks!
+```bash
+# Index code for semantic search
+python scripts/embed_codebase.py
+```
+
+This creates a vector database of your code that agents can query for context.
 
 ---
 
+## 💼 How It Works
+
+### 1. Create a Task
+
+```bash
+python scripts/task_manager.py add \
+  --title "Add user authentication" \
+  --assigned "Dev1" \
+  --description "Implement login and registration with JWT tokens"
+```
+
+### 2. Agent Executes Automatically
+
+The Dev1 agent (running Anthropic Claude):
+
+1. **Queries RAG** for similar authentication code
+2. **Builds context** with relevant code snippets
+3. **Generates code** using Claude with full context
+4. **Validates syntax** before applying changes
+5. **Creates files** with automatic backups
+6. **Updates task status** to TESTING
+
+### 3. Workflow Continues
+
+- **Testing agent** writes and runs tests
+- **Review agent** checks code quality
+- **DevOps agent** merges to main branch
+
+All automatically, with full LLM intelligence!
 
 ---
 
-## 💼 Workflow
+## 📊 Features
 
-### 1. Planning (Human ↔ Taskmaster)
+### RAG-Powered Code Generation
 
-You generally don't edit `tasks.json` manually. Instead, use the CLI tool or chat with the **Taskmaster Agent**.
+Agents don't code in a vacuum. Before generating code, they:
 
-**Recommended:**
-- **Chat**: "Taskmaster, create a task for login."
-- **CLI**: `python scripts/task_manager.py add ...`
+```python
+# Agent queries codebase
+rag_results = rag_client.query("authentication patterns", n_results=5)
 
-**Fallback:**
-- Edit `tasks.json` manually (only if tools fail).
+# Relevant code is injected into LLM prompt
+context = """
+## Relevant Code from Codebase
 
-**Human**: "We need a new login page."
-**Taskmaster**: Uses `scripts/task_manager.py` to create tasks:
-- `T-001: Backend Login Logic` (assigned to Dev1)
-- `T-002: Frontend Login Form` (assigned to Dev2)
+### Source: auth/login.py
+```python
+def authenticate_user(username, password):
+    # Existing auth logic...
+```
+"""
 
-### 2. Automation (Watcher)
+# LLM generates code aware of existing patterns
+response = llm.generate(context + task_description)
+```
 
-The `watcher.py` script detects the new tasks in `tasks.json`.
-- It **wakes up** the `agent_dev1` container.
-- It **wakes up** the `agent_dev2` container.
+### Intelligent Code Editing
 
-### 3. Development (Dev Agents)
+```python
+# LLM response is parsed
+### File: auth/register.py
+```python
+def register_user(email, password):
+    # New registration logic
+```
 
-The agents receive the notification and start working.
-- **Dev1**: Implements backend, commits code.
-- **Dev1**: Updates status: `python scripts/task_manager.py update T-001 --status TESTING`
-- **Dev2**: Implements frontend, commits code.
-- **Dev2**: Updates status: `python scripts/task_manager.py update T-002 --status TESTING`
+# Code is validated, backed up, and applied
+editor.parse_and_apply(llm_response)
+```
 
-### 4. Testing
+### Conversation History
 
-- **Watcher** detects status change to `TESTING`.
-- **Testing Agent** is triggered, writes and runs tests.
-- If tests pass: Updates to `REVIEW` status.
-- If tests fail: Updates back to `TODO` and notifies Dev1/Dev2.
+Each task maintains full conversation context:
 
-### 5. Review & Merge
+```
+work_artifacts/contexts/
+├── T-001_Dev1.json              # State
+├── T-001_Dev1_conversation.md   # Human-readable
+└── ...
+```
 
-- **Review Agent** is triggered when status is `REVIEW`.
-- Reviews code quality, approves or requests changes.
-- If approved: Updates to `APPROVED` status.
-- **DevOps Agent** is triggered, merges approved code to `dev` branch.
-- Updates status to `COMPLETED`.
+### Token Tracking
+
+```
+✅ LLM Response received (1,247 tokens)
+   Total tokens used: 3,891
+   Estimated cost: $0.02
+```
+
+---
+
+## 🛠️ Agent Roles
+
+| Agent | LLM Provider | Model | Responsibility |
+|-------|--------------|-------|----------------|
+| **Taskmaster** | OpenAI | GPT-4o | Task decomposition, planning |
+| **Dev1** | Anthropic | Claude Sonnet 4 | Core business logic |
+| **Dev2** | Anthropic | Claude Sonnet 4 | APIs & integrations |
+| **Testing** | Anthropic | Claude Sonnet 4 | Test generation & QA |
+| **Review** | OpenAI | GPT-4o | Code review & security |
+| **DevOps** | Anthropic | Claude Sonnet 4 | CI/CD & merging |
+
+---
+
+## 📚 Documentation
+
+- **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
+- **[docs/llm_integration.md](docs/llm_integration.md)** - Complete LLM integration guide
+- **[docs/agents.md](docs/agents.md)** - Detailed agent roles and workflows
+- **[docs/architecture_decisions.md](docs/architecture_decisions.md)** - Design decisions
 
 ---
 
 ## 🔒 Security
 
-- **Non-Root Users**: All agent containers run as a non-root user (`devstack`) to prevent privilege escalation.
-- **Secrets Management**: API keys and sensitive data are managed via `.env` file (not committed to Git).
-- **Network Isolation**: Agents communicate over a private Docker bridge network.
-
-## 💾 Data Persistence
-
-- **ChromaDB**: Vector data is persisted in the `chroma_data` Docker volume. This ensures your RAG index survives container restarts.
-- **Tasks**: `tasks.json` is a file on your host machine, mounted into containers. It is your primary persistent state.
-- **Code**: The codebase is mounted via Git Worktrees. Changes are committed to Git, which is the ultimate source of truth for code.
-
-## 📊 Observability
-
-- **Dashboard**: Generate a visual status report of all tasks.
-  ```bash
-  python scripts/task_manager.py report --html
-  ```
-  Open `dashboard.html` (generated in the project root) to view the project status.
-
-## 🏗️ Architecture Decisions
-
-For details on scalability, conflict resolution, and trade-offs, see [docs/architecture_decisions.md](docs/architecture_decisions.md).
+- **API Keys**: Stored in `.env` (gitignored)
+- **Non-Root Containers**: All agents run as unprivileged users
+- **Code Validation**: Syntax checking before file writes
+- **Backups**: Automatic backups in `.code_backups/`
+- **Network Isolation**: Private Docker network
 
 ---
 
+## 💾 Data Persistence
 
-## 🛠️ Agent Roles & Branches
-
-| Agent      | Container          | Branch         | Responsibility              |
-|------------|--------------------|----------------|----------------------------|
-| Taskmaster | `agent_taskmaster` | `chore/devops` | Task planning & assignment |
-| Dev1       | `agent_dev1`       | `feat/dev1`    | Core business logic        |
-| Dev2       | `agent_dev2`       | `feat/dev2`    | APIs & integrations        |
-| Testing    | `agent_testing`    | `test/testing` | Test automation & QA       |
-| Review     | `agent_review`     | `review/main`  | Code review                |
-| DevOps     | `agent_devops`     | `chore/devops` | CI/CD & merging            |
+- **ChromaDB**: Vector data in `chroma_data` volume
+- **Tasks**: `tasks.json` on host machine
+- **Code**: Git worktrees with full history
+- **Conversations**: Saved in `work_artifacts/contexts/`
+- **Backups**: Code backups in `.code_backups/`
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Container won't start
+### Agent not responding
+
 ```bash
-# Rebuild images
-docker compose -f docker-compose.yml -f docker-compose.agents.yml build --no-cache
+# Check logs
+docker logs -f agent_dev1
+
+# Verify API key
+cat .env | grep API_KEY
+
+# Restart agent
+docker restart agent_dev1
 ```
 
-### Watcher not triggering
-- Ensure `tasks.json` is valid JSON.
-- Check if Docker is running.
-- Check watcher logs in `logs/watcher.err`.
+### RAG not finding code
 
-### Worktrees are broken
-If you see errors about "worktree already exists" or "is not a git repository":
 ```bash
-# Prune stale worktree entries
-git worktree prune
+# Re-index codebase
+python scripts/embed_codebase.py
 
-# Re-run setup script
-bash scripts/setup_worktrees.sh
+# Check ChromaDB
+docker logs chroma
+```
+
+### Token limit errors
+
+Edit `config/agent_config.yml`:
+```yaml
+dev1:
+  max_tokens: 4000  # Reduce if hitting limits
+  rag_chunks: 5     # Reduce context size
 ```
 
 ---
 
-**Version**: 1.1  
-**Last Updated**: 2025-11-19  
+## 📈 Cost Optimization
+
+Typical costs per task (GPT-4o/Claude Sonnet):
+
+- **Simple task** (add function): ~$0.01
+- **Medium task** (implement feature): ~$0.05
+- **Complex task** (full module): ~$0.15
+
+**Tips to reduce costs:**
+1. Use `gpt-4o-mini` instead of `gpt-4o` (10x cheaper)
+2. Reduce `max_tokens` in agent config
+3. Limit RAG chunks to 3-5 instead of 10+
+4. Use temperature=0.3 for code tasks
+
+---
+
+## 🎓 Example: Full Workflow
+
+```bash
+# 1. Create task
+python scripts/task_manager.py add \
+  --title "Add password reset" \
+  --assigned "Dev1" \
+  --description "Implement password reset via email"
+
+# 2. Watch agent work
+docker logs -f agent_dev1
+
+# Output:
+# 🔍 Searching codebase for relevant context...
+#    Found 5 relevant code snippets
+# 🤖 Querying LLM for implementation...
+# ✅ LLM Response received (2,341 tokens)
+# 📝 Parsing and applying code changes...
+# ✅ Successfully applied 3 file changes
+#    - auth/reset_password.py
+#    - auth/email_service.py
+#    - tests/test_reset.py
+
+# 3. Check results
+cat auth/reset_password.py
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! This is a community-driven project.
+
+---
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) file
+
+---
+
+**Version**: 2.0  
+**Last Updated**: 2025-11-25  
 **Maintained By**: Dev_Stack Community
+
+**Ready to let AI agents build your code!** 🚀
