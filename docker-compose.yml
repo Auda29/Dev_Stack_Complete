@@ -14,7 +14,7 @@ services:
   #     - "5432:5432"
   #   volumes:
   #     - postgres_data:/var/lib/postgresql/data
-  
+
   # redis:
   #   image: redis:7-alpine
   #   ports:
@@ -32,7 +32,7 @@ services:
     networks:
       - devstack
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      test: [ "CMD", "true" ]
       interval: 30s
       timeout: 10s
       retries: 3

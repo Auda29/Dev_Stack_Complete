@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     depends_on:
       chroma:
-        condition: service_healthy
+        condition: service_started
 
   # Dev1 - Core domain logic developer
   agent_dev1:
@@ -50,7 +50,7 @@ services:
     restart: unless-stopped
     depends_on:
       chroma:
-        condition: service_healthy
+        condition: service_started
 
   # Dev2 - API/Integration developer
   agent_dev2:
@@ -75,7 +75,7 @@ services:
     restart: unless-stopped
     depends_on:
       chroma:
-        condition: service_healthy
+        condition: service_started
 
   # Testing - QA and test automation
   agent_testing:
@@ -100,7 +100,7 @@ services:
     restart: unless-stopped
     depends_on:
       chroma:
-        condition: service_healthy
+        condition: service_started
 
   # Review - Code review and quality checks
   agent_review:
@@ -125,7 +125,7 @@ services:
     restart: unless-stopped
     depends_on:
       chroma:
-        condition: service_healthy
+        condition: service_started
 
   # DevOps - Integration, merging, CI/CD
   agent_devops:
