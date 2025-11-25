@@ -1,7 +1,7 @@
 # Dev_Stack Development Image
 # Base image for all AI agent containers
 
-FROM ubuntu:24.04
+FROM ubuntu:22.04
 
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -31,10 +31,13 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install common linters and formatters
-RUN pip3 install flake8 black chromadb --break-system-packages
+RUN pip3 install --upgrade pip
+RUN pip3 install --no-cache-dir flake8 black
+RUN pip3 install --no-cache-dir chromadb
 
 
 # Install Go - uncomment if needed
