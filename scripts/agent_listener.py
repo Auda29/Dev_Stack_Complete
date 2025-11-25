@@ -7,7 +7,8 @@ from datetime import datetime
 
 # Configuration
 AGENT_NAME = os.environ.get("AGENT_NAME", "Unknown")
-NOTIFICATION_FILE = "/tmp/agent_notifications"
+import tempfile
+NOTIFICATION_FILE = os.path.join(tempfile.gettempdir(), "agent_notifications")
 TASKS_FILE = "/repo/tasks.json"
 TASK_MANAGER = "/repo/scripts/task_manager.py"
 POLL_INTERVAL = 1  # seconds
@@ -97,8 +98,10 @@ def determine_next_status(agent_name, current_status):
     return None
 
 
-def simulate_work(task):
-    """Simulate doing work on a task (placeholder for LLM integration)"""
+from llm_client import get_llm_client
+
+def execute_work(task):
+    """Execute work on a task using the configured LLM provider"""
     task_id = task['id']
     title = task['title']
     description = task.get('description', 'No description')
@@ -106,25 +109,42 @@ def simulate_work(task):
     log(f"📋 Starting work on task {task_id}: {title}")
     log(f"   Description: {description}")
     
-    # Placeholder for future LLM integration
-    # TODO: This is where you would:
-    # 1. Read task requirements
-    # 2. Query LLM for implementation
-    # 3. Write code files
-    # 4. Commit changes to git
-    # 5. Run tests
-    
-    log(f"🔨 Simulating work for {WORK_SIMULATION_TIME} seconds...")
-    
-    # Simulate work in chunks to show progress
-    chunks = 5
-    chunk_time = WORK_SIMULATION_TIME / chunks
-    for i in range(chunks):
-        time.sleep(chunk_time)
-        progress = int((i + 1) / chunks * 100)
-        log(f"   Progress: {progress}%")
-    
-    log(f"✅ Work completed on task {task_id}")
+    try:
+        client = get_llm_client()
+        
+        # Construct prompt
+        system_prompt = f"You are an AI agent named {AGENT_NAME}. Your role is {os.environ.get('AGENT_ROLE', 'Developer')}."
+        prompt = f"""
+        Task ID: {task_id}
+        Title: {title}
+        Description: {description}
+        
+        Please perform this task. If it involves writing code, provide the code blocks.
+        If it involves planning, provide the plan.
+        """
+        
+        log("🤖 Querying LLM...")
+        response = client.generate_text(prompt, system_prompt)
+        
+        log(f"✅ LLM Response received ({len(response)} chars)")
+        log("---------------------------------------------------")
+        log(response)
+        log("---------------------------------------------------")
+        
+        # Save response to artifact
+        work_dir = "work_artifacts"
+        if not os.path.exists(work_dir):
+            os.makedirs(work_dir)
+            
+        artifact_path = os.path.join(work_dir, f"{task_id}_response.md")
+        with open(artifact_path, "w", encoding="utf-8") as f:
+            f.write(f"# Task {task_id}: {title}\n\n")
+            f.write(response)
+            
+        log(f"💾 Saved response to {artifact_path}")
+        
+    except Exception as e:
+        log(f"❌ Error executing work: {e}")
 
 
 def execute_task(task):
@@ -140,8 +160,8 @@ def execute_task(task):
         if not update_task_status(task_id, next_status):
             return False
         
-        # Simulate work
-        simulate_work(task)
+        # Execute work
+        execute_work(task)
         
         # Move to next stage
         final_status = determine_next_status(AGENT_NAME, "WIP")
@@ -151,7 +171,7 @@ def execute_task(task):
     elif current_status == "WIP":
         # Already in progress, continue and finish
         log(f"⚡ Continuing work on task {task_id}")
-        simulate_work(task)
+        execute_work(task)
         
         # Complete and move to next status
         next_status = determine_next_status(AGENT_NAME, "WIP")

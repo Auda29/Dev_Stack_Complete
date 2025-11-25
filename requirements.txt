@@ -5,5 +5,10 @@
 # RAG / Vector Database for code indexing
 chromadb>=0.4.0
 
+# LLM Providers
+openai>=1.0.0
+anthropic>=0.3.0
+google-generativeai>=0.3.0
+
 # Note: Other common dependencies like requests, pyyaml, etc. are typically
 # included in Python standard library or already available on most systems

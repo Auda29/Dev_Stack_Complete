@@ -73,6 +73,7 @@ RUN chmod +x /usr/local/bin/agent_listener.py
 USER devstack
 
 # Default command (keeps container running)
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["tail", "-f", "/dev/null"]
 
 # Health check

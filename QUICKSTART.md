@@ -27,20 +27,6 @@ If you already have a codebase and want to enable Dev_Stack agents on it:
    - `docs/`
    - `scripts/`
    - `docker-compose*.yml`
-   - `tasks.json`
-   - `.gitignore` (merge with yours)
-3. Run setup:
-   ```bash
-   bash scripts/setup_worktrees.sh
-   ```
-4. Start Docker:
-   ```bash
-   docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
-   ```
-
-### Option B: Clone Dev_Stack and Import Code
-1. Clone this repository:
-   ```bash
    git clone https://github.com/your/dev_stack.git my-new-project
    cd my-new-project
    rm -rf .git  # Optional: Start fresh git history
@@ -105,6 +91,9 @@ docker compose -f docker-compose.yml -f docker-compose.agents.yml run --rm agent
 ### 4. Start Containers
 
 ```bash
+# Make sure to copy .env.example to .env first!
+cp .env.example .env
+# Edit .env to set your LLM_PROVIDER and API Key (e.g., OPENAI_API_KEY)
 docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
 ```
 

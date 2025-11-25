@@ -3,8 +3,13 @@ import sys
 from datetime import datetime
 
 # Configuration
-TASKS_JSON = "tasks.json"
-OUTPUT_MD = "docs/tasks.md"
+import os
+
+# Configuration
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+TASKS_JSON = os.path.join(PROJECT_ROOT, "tasks.json")
+OUTPUT_MD = os.path.join(PROJECT_ROOT, "docs", "tasks.md")
 
 
 def load_tasks():

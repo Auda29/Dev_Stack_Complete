@@ -82,6 +82,30 @@ graph TD
 
 ---
 
+---
+
+## 🧠 LLM Configuration
+
+Dev_Stack supports multiple LLM providers. You can configure which one to use via environment variables in `.env`.
+
+### Supported Providers
+
+Set `LLM_PROVIDER` to one of the following:
+
+- **`openai`** (Default)
+  - Requires `OPENAI_API_KEY`
+  - Optional: `OPENAI_MODEL` (default: `gpt-4o`)
+
+- **`anthropic`**
+  - Requires `ANTHROPIC_API_KEY`
+  - Optional: `ANTHROPIC_MODEL` (default: `claude-3-5-sonnet-20240620`)
+
+- **`google`**
+  - Requires `GOOGLE_API_KEY`
+  - Optional: `GOOGLE_MODEL` (default: `gemini-1.5-pro`)
+
+---
+
 ## 📋 Prerequisites
 
 Before starting, ensure you have:
@@ -89,18 +113,6 @@ Before starting, ensure you have:
 - ✅ **Docker Desktop** installed and running
 - ✅ **Git** installed (version 2.25+)
 - ✅ **Python 3.8+** installed (for host-side utility scripts)
-- ✅ An IDE that supports Docker (VS Code, Cursor, etc.)
-
-**Verify installation:**
-```bash
-docker --version
-git --version
-python3 --version  # or 'python --version' on Windows
-```
-
----
-
-## 🚀 Quick Start
 
 ### 1. Clone or Create Your Project
 
