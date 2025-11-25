@@ -31,6 +31,12 @@ services:
       - chroma_data:/chroma/chroma
     networks:
       - devstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
 volumes:
   chroma_data:

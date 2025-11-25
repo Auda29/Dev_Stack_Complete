@@ -20,6 +20,10 @@ services:
       - devstack
     env_file:
       - .env
+    restart: unless-stopped
+    depends_on:
+      chroma:
+        condition: service_healthy
 
   # Dev1 - Core domain logic developer
   agent_dev1:
@@ -39,6 +43,10 @@ services:
       - devstack
     env_file:
       - .env
+    restart: unless-stopped
+    depends_on:
+      chroma:
+        condition: service_healthy
 
   # Dev2 - API/Integration developer
   agent_dev2:
@@ -58,6 +66,10 @@ services:
       - devstack
     env_file:
       - .env
+    restart: unless-stopped
+    depends_on:
+      chroma:
+        condition: service_healthy
 
   # Testing - QA and test automation
   agent_testing:
@@ -77,6 +89,10 @@ services:
       - devstack
     env_file:
       - .env
+    restart: unless-stopped
+    depends_on:
+      chroma:
+        condition: service_healthy
 
   # Review - Code review and quality checks
   agent_review:
@@ -96,6 +112,10 @@ services:
       - devstack
     env_file:
       - .env
+    restart: unless-stopped
+    depends_on:
+      chroma:
+        condition: service_healthy
 
   # DevOps - Integration, merging, CI/CD
   agent_devops:
@@ -115,6 +135,10 @@ services:
       - devstack
     env_file:
       - .env
+    restart: unless-stopped
+    depends_on:
+      chroma:
+        condition: service_healthy
 
 networks:
   devstack:

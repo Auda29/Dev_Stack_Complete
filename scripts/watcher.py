@@ -37,8 +37,11 @@ def get_file_content(filepath):
     except FileNotFoundError:
         print(f"Error: File {filepath} not found.")
         return None
-    except json.JSONDecodeError:
-        print(f"Error: File {filepath} contains invalid JSON.")
+    except json.JSONDecodeError as e:
+        print(f"Error: File {filepath} contains invalid JSON: {e}", file=sys.stderr)
+        return None
+    except Exception as e:
+        print(f"Error reading {filepath}: {e}", file=sys.stderr)
         return None
 
 
@@ -187,6 +190,12 @@ def main():
 
     except KeyboardInterrupt:
         print("\nStopping Watcher.")
+    except Exception as e:
+        print(f"CRITICAL ERROR in Watcher: {e}", file=sys.stderr)
+        # Optional: sleep and retry instead of crashing?
+        # For now, we exit to let Docker restart policy handle it if needed, 
+        # but logging is crucial.
+        sys.exit(1)
 
 
 if __name__ == "__main__":

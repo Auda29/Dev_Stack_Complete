@@ -1,7 +1,11 @@
 # Dev_Stack – Local Multi-Agent Development System
 
+> **Local multi-agent dev workflow template (Docker, Git worktrees, RAG, Cursor-friendly).**
+
 A **fully local, containerized** development workflow where multiple AI agents collaborate in parallel without conflicts.
 Each agent works in isolation using **Docker containers** and **Git worktrees**.
+
+**Topics**: `dev-tools`, `ai-agents`, `docker`, `git-worktree`, `rag`, `cursor`, `local-llm`
 
 ---
 
@@ -278,13 +282,19 @@ The agents receive the notification and start working.
 - **Secrets Management**: API keys and sensitive data are managed via `.env` file (not committed to Git).
 - **Network Isolation**: Agents communicate over a private Docker bridge network.
 
+## 💾 Data Persistence
+
+- **ChromaDB**: Vector data is persisted in the `chroma_data` Docker volume. This ensures your RAG index survives container restarts.
+- **Tasks**: `tasks.json` is a file on your host machine, mounted into containers. It is your primary persistent state.
+- **Code**: The codebase is mounted via Git Worktrees. Changes are committed to Git, which is the ultimate source of truth for code.
+
 ## 📊 Observability
 
 - **Dashboard**: Generate a visual status report of all tasks.
   ```bash
   python scripts/task_manager.py report --html
   ```
-  Open `dashboard.html` to view the project status.
+  Open `dashboard.html` (generated in the project root) to view the project status.
 
 ## 🏗️ Architecture Decisions
 
