@@ -3,7 +3,7 @@ import chromadb
 import glob
 
 # Configuration
-CHROMA_HOST = os.environ.get("CHROMA_HOST", "chroma")
+CHROMA_HOST = os.environ.get("CHROMA_HOST")
 CHROMA_PORT = os.environ.get("CHROMA_PORT", "8000")
 COLLECTION_NAME = "dev_stack_codebase"
 EXTENSIONS = ["*.py", "*.md", "*.js", "*.ts", "*.html", "*.css", "*.sh", "*.yml", "*.yaml"]
@@ -32,17 +32,40 @@ def chunk_text(text, chunk_size=1000, overlap=100):
     return chunks
 
 
-def main():
-    print(f"Connecting to ChromaDB at {CHROMA_HOST}:{CHROMA_PORT}...")
+def connect_to_chroma():
+    """
+    Attempt to connect to the configured Chroma host; if not provided,
+    fall back to common defaults so users do not need to set CHROMA_HOST.
+    """
+    host_candidates = []
+    if CHROMA_HOST:
+        host_candidates.append(CHROMA_HOST)
+    host_candidates.extend(["chroma", "localhost"])
+    # Preserve order while removing duplicates
+    seen = set()
+    ordered_hosts = []
+    for host in host_candidates:
+        if host not in seen:
+            ordered_hosts.append(host)
+            seen.add(host)
 
-    try:
-        client = chromadb.HttpClient(host=CHROMA_HOST, port=int(CHROMA_PORT))
-        # Use default embedding function (all-MiniLM-L6-v2 usually)
-        collection = client.get_or_create_collection(name=COLLECTION_NAME)
-        print(f"Collection '{COLLECTION_NAME}' ready.")
-    except Exception as e:
-        print(f"Error connecting to ChromaDB: {e}")
-        print("Make sure the chroma service is running: docker compose up -d chroma")
+    for host in ordered_hosts:
+        print(f"Connecting to ChromaDB at {host}:{CHROMA_PORT}...")
+        try:
+            client = chromadb.HttpClient(host=host, port=int(CHROMA_PORT))
+            collection = client.get_or_create_collection(name=COLLECTION_NAME)
+            print(f"Collection '{COLLECTION_NAME}' ready (host: {host}).")
+            return collection
+        except Exception as err:
+            print(f"  Connection attempt failed: {err}")
+
+    print("Unable to connect to Chroma. Ensure the service is running (docker compose up -d chroma).")
+    return None
+
+
+def main():
+    collection = connect_to_chroma()
+    if not collection:
         return
 
     files = get_files()

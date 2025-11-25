@@ -204,7 +204,7 @@ docker compose -f docker-compose.yml -f docker-compose.agents.yml up -d
 python scripts/embed_codebase.py
 ```
 
-This creates a vector database of your code that agents can query for context.
+This creates a vector database of you0r code that agents can query for context.
 
 ---
 
