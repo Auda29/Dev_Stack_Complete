@@ -36,13 +36,13 @@ Dev_Stack enables you to orchestrate multiple specialized AI agents working toge
 
 ```mermaid
 graph TD
-    Human[👤 Human] -->|Create Task| JSON[(tasks.json)]
+    Human[👤 Human] -->|Chat/Requirements| Taskmaster
     
     subgraph "AI Agent System"
+        Taskmaster[🎯 Taskmaster<br/>GPT-4o] -->|Create/Assign Tasks| JSON[(tasks.json)]
         JSON -->|Notify| Agents
         
         subgraph Agents [Docker Containers + LLM]
-            Taskmaster[🎯 Taskmaster<br/>GPT-4o]
             Dev1[👨‍💻 Dev1<br/>Claude]
             Dev2[👩‍💻 Dev2<br/>Claude]
             Testing[🧪 Testing<br/>Claude]
@@ -55,6 +55,7 @@ graph TD
             LLM[🤖 LLM APIs<br/>OpenAI/Anthropic]
         end
         
+        Taskmaster <-->|Plan & Decompose| LLM
         Agents <-->|Query Context| RAG
         Agents <-->|Generate Code| LLM
     end
@@ -209,16 +210,22 @@ This creates a vector database of your code that agents can query for context.
 
 ## 💼 How It Works
 
-### 1. Create a Task
+### 1. Chat with Taskmaster
 
-```bash
-python scripts/task_manager.py add \
-  --title "Add user authentication" \
-  --assigned "Dev1" \
-  --description "Implement login and registration with JWT tokens"
-```
+Instead of manually creating tasks, you chat with the **Taskmaster agent** (via Cursor, ChatGPT, or any LLM interface):
 
-### 2. Agent Executes Automatically
+**You say:**
+> "I need user authentication with JWT tokens for login and registration"
+
+**Taskmaster:**
+- Understands your requirements
+- Breaks them down into atomic tasks
+- Assigns tasks to appropriate agents (Dev1, Dev2, etc.)
+- Uses `task_manager.py` to create tasks in `tasks.json`
+
+*Note: You can also create tasks manually using `python scripts/task_manager.py add ...` if preferred.*
+
+### 2. Agents Execute Automatically
 
 The Dev1 agent (running Anthropic Claude):
 
@@ -315,6 +322,7 @@ work_artifacts/contexts/
 ## 📚 Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
+- **[docs/cursor_integration.md](docs/cursor_integration.md)** - Chat with Taskmaster via Cursor/LLM
 - **[docs/llm_integration.md](docs/llm_integration.md)** - Complete LLM integration guide
 - **[docs/agents.md](docs/agents.md)** - Detailed agent roles and workflows
 - **[docs/architecture_decisions.md](docs/architecture_decisions.md)** - Design decisions
@@ -395,14 +403,48 @@ Typical costs per task (GPT-4o/Claude Sonnet):
 
 ## 🎓 Example: Full Workflow
 
+### Option 1: Chat with Taskmaster (Recommended)
+
+**In Cursor or your LLM interface:**
+
+**You:**
+> "Act as Taskmaster. I need to implement password reset functionality via email. Break this down into tasks and assign them to the appropriate agents."
+
+**Taskmaster:**
+> "I'll create the following tasks:
+> 1. Dev1: Implement password reset token generation and validation logic
+> 2. Dev2: Create password reset API endpoints and email service integration
+> 3. Testing: Write tests for password reset flow
+>
+> Creating tasks now..."
+
 ```bash
-# 1. Create task
+# Taskmaster executes:
+python scripts/task_manager.py add \
+  --title "Password reset token logic" \
+  --assigned "Dev1" \
+  --description "Implement secure token generation with expiry and validation"
+
+python scripts/task_manager.py add \
+  --title "Password reset API and email" \
+  --assigned "Dev2" \
+  --description "Create /api/reset-password endpoint and integrate email service"
+```
+
+### Option 2: Manual Task Creation
+
+```bash
+# Create task directly
 python scripts/task_manager.py add \
   --title "Add password reset" \
   --assigned "Dev1" \
   --description "Implement password reset via email"
+```
 
-# 2. Watch agent work
+### Watch Agents Work
+
+```bash
+# Watch agent work
 docker logs -f agent_dev1
 
 # Output:
@@ -415,10 +457,15 @@ docker logs -f agent_dev1
 #    - auth/reset_password.py
 #    - auth/email_service.py
 #    - tests/test_reset.py
+```
 
-# 3. Check results
+### Check Results
+
+```bash
 cat auth/reset_password.py
 ```
+
+**For more chat examples, see [docs/cursor_integration.md](docs/cursor_integration.md)**
 
 ---
 
