@@ -119,8 +119,15 @@ def execute_work(task):
         Title: {title}
         Description: {description}
         
-        Please perform this task. If it involves writing code, provide the code blocks.
-        If it involves planning, provide the plan.
+        Please perform this task. 
+        If you need to create or modify files, use the following format EXACTLY:
+        
+        ### File: path/to/filename.ext
+        ```language
+        code content...
+        ```
+        
+        You can provide multiple files.
         """
         
         log("🤖 Querying LLM...")
@@ -143,8 +150,54 @@ def execute_work(task):
             
         log(f"💾 Saved response to {artifact_path}")
         
+        # Apply changes
+        apply_code_changes(response)
+        
     except Exception as e:
         log(f"❌ Error executing work: {e}")
+
+def apply_code_changes(response_text):
+    """
+    Parses markdown code blocks and applies them to files.
+    Format expected:
+    
+    ### File: path/to/file.py
+    ```python
+    code...
+    ```
+    """
+    import re
+    
+    # Regex to find file paths and code blocks
+    # Looks for lines starting with "### File: <path>" followed by a code block
+    pattern = r"### File: (.+?)\n.*?```\w*\n(.*?)```"
+    matches = re.findall(pattern, response_text, re.DOTALL)
+    
+    if not matches:
+        log("ℹ️ No code blocks to apply found in response.")
+        return
+
+    for file_path, code_content in matches:
+        file_path = file_path.strip()
+        
+        # Security check: prevent writing outside repo
+        if ".." in file_path or file_path.startswith("/"):
+            log(f"⚠️ Skipping unsafe file path: {file_path}")
+            continue
+            
+        full_path = os.path.join(os.getcwd(), file_path)
+        dir_name = os.path.dirname(full_path)
+        
+        try:
+            if dir_name and not os.path.exists(dir_name):
+                os.makedirs(dir_name)
+                
+            with open(full_path, "w", encoding="utf-8") as f:
+                f.write(code_content)
+            log(f"✅ Wrote code to {file_path}")
+            
+        except Exception as e:
+            log(f"❌ Failed to write to {file_path}: {e}")
 
 
 def execute_task(task):

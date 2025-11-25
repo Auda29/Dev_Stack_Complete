@@ -224,6 +224,25 @@ $env:CHROMA_HOST="localhost"; python scripts/embed_codebase.py
 
 > **Note:** Make sure you've run `scripts/setup_host.sh` (or `.ps1` on Windows) first to install `chromadb`.
 
+---
+
+## 🎓 Try It Out: Example Project
+
+Want to see the system in action? Run the example project seeder:
+
+```bash
+python scripts/create_example_project.py
+```
+
+This creates a simple **Todo App** with tasks for:
+- **DevOps**: Project setup
+- **Dev1**: Backend API
+- **Dev2**: Frontend UI
+
+Once seeded, the agents (if configured with API keys) will automatically start working on these tasks!
+
+---
+
 
 ---
 

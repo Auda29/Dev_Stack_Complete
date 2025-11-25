@@ -15,7 +15,8 @@ services:
     environment:
       - AGENT_NAME=Taskmaster
       - AGENT_ROLE=orchestration
-    command: tail -f /dev/null
+      - PYTHONUNBUFFERED=1
+    command: python -u scripts/agent_listener.py
     networks:
       - devstack
     env_file:
@@ -38,7 +39,8 @@ services:
     environment:
       - AGENT_NAME=Dev1
       - AGENT_ROLE=core_development
-    command: tail -f /dev/null
+      - PYTHONUNBUFFERED=1
+    command: python -u scripts/agent_listener.py
     networks:
       - devstack
     env_file:
@@ -61,7 +63,8 @@ services:
     environment:
       - AGENT_NAME=Dev2
       - AGENT_ROLE=integration_development
-    command: tail -f /dev/null
+      - PYTHONUNBUFFERED=1
+    command: python -u scripts/agent_listener.py
     networks:
       - devstack
     env_file:
@@ -84,7 +87,8 @@ services:
     environment:
       - AGENT_NAME=Testing
       - AGENT_ROLE=quality_assurance
-    command: tail -f /dev/null
+      - PYTHONUNBUFFERED=1
+    command: python -u scripts/agent_listener.py
     networks:
       - devstack
     env_file:
@@ -107,7 +111,8 @@ services:
     environment:
       - AGENT_NAME=Review
       - AGENT_ROLE=code_review
-    command: tail -f /dev/null
+      - PYTHONUNBUFFERED=1
+    command: python -u scripts/agent_listener.py
     networks:
       - devstack
     env_file:
@@ -130,7 +135,8 @@ services:
     environment:
       - AGENT_NAME=DevOps
       - AGENT_ROLE=integration_deployment
-    command: tail -f /dev/null
+      - PYTHONUNBUFFERED=1
+    command: python -u scripts/agent_listener.py
     networks:
       - devstack
     env_file:
