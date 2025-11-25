@@ -1,0 +1,72 @@
+# Agent Configuration
+# This file defines settings for each agent in the system
+
+agents:
+  taskmaster:
+    max_tokens: 8000
+    temperature: 0.7
+    rag_chunks: 10
+    capabilities:
+      - task_decomposition
+      - planning
+      - dependency_management
+  
+  dev1:
+    max_tokens: 8000
+    temperature: 0.3  # Lower for focused code generation
+    rag_chunks: 15
+    capabilities:
+      - code_generation
+      - refactoring
+      - business_logic
+      - database_design
+  
+  dev2:
+    max_tokens: 8000
+    temperature: 0.3
+    rag_chunks: 15
+    capabilities:
+      - api_development
+      - frontend_development
+      - integration
+      - ui_components
+  
+  testing:
+    max_tokens: 6000
+    temperature: 0.4
+    rag_chunks: 10
+    capabilities:
+      - test_generation
+      - test_execution
+      - bug_reporting
+      - coverage_analysis
+  
+  review:
+    max_tokens: 6000
+    temperature: 0.5
+    rag_chunks: 12
+    capabilities:
+      - code_review
+      - security_audit
+      - quality_analysis
+      - best_practices
+  
+  devops:
+    max_tokens: 4000
+    temperature: 0.4
+    rag_chunks: 8
+    capabilities:
+      - merge_resolution
+      - ci_cd
+      - deployment
+      - infrastructure
+
+# Global settings
+global:
+  default_max_tokens: 4096
+  default_temperature: 0.7
+  enable_rag: true
+  save_conversations: true
+  auto_format_code: true
+  enable_backups: true
+  backup_retention_days: 7
