@@ -17,6 +17,7 @@ astor>=0.8.0             # AST manipulation for code analysis
 black>=23.0.0            # Code formatting
 gitpython>=3.1.0         # Git operations from Python
 tenacity>=8.0.0          # Retry logic with exponential backoff
+python-dotenv>=1.0.0     # Load environment variables from .env
 
 # Note: Other common dependencies like requests, pyyaml, etc. are typically
 # included in Python standard library or already available on most systems

@@ -20,6 +20,50 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from llm_client import get_llm_client
 
+def load_env_file():
+    """Load environment variables from .env file."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(base_dir)
+    env_file = os.path.join(project_root, ".env")
+    
+    if not os.path.exists(env_file):
+        print(f"Warning: .env file not found at {env_file}")
+        return
+
+    # Try using python-dotenv if available
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(env_file)
+        return
+    except ImportError:
+        pass
+
+    # Fallback: Manual parsing
+    try:
+        with open(env_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip()
+                    
+                    # Remove quotes if present
+                    if (value.startswith('"') and value.endswith('"')) or \
+                       (value.startswith("'") and value.endswith("'")):
+                        value = value[1:-1]
+                    
+                    if key and not os.environ.get(key):
+                        os.environ[key] = value
+    except Exception as e:
+        print(f"Error parsing .env file: {e}")
+
+# Load environment variables before using LLM client
+load_env_file()
+
 
 class TaskmasterChat:
     def __init__(self):
