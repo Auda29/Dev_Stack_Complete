@@ -42,7 +42,7 @@ services:
       - AGENT_ROLE=core_development
       - PYTHONUNBUFFERED=1
       - LLM_PROVIDER=anthropic
-      - ANTHROPIC_MODEL=claude-3-5-sonnet-20240620
+      - ANTHROPIC_MODEL=claude-sonnet-4-5
     command: python -u scripts/agent_listener.py
     networks:
       - devstack
@@ -68,7 +68,7 @@ services:
       - AGENT_ROLE=integration_development
       - PYTHONUNBUFFERED=1
       - LLM_PROVIDER=anthropic
-      - ANTHROPIC_MODEL=claude-3-5-sonnet-20240620
+      - ANTHROPIC_MODEL=claude-sonnet-4-5
     command: python -u scripts/agent_listener.py
     networks:
       - devstack
@@ -94,7 +94,7 @@ services:
       - AGENT_ROLE=quality_assurance
       - PYTHONUNBUFFERED=1
       - LLM_PROVIDER=anthropic
-      - ANTHROPIC_MODEL=claude-3-5-sonnet-20240620
+      - ANTHROPIC_MODEL=claude-sonnet-4-5
     command: python -u scripts/agent_listener.py
     networks:
       - devstack

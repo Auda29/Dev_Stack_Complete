@@ -93,7 +93,7 @@ class OpenAIClient(LLMClient):
             if not api_key:
                 raise ValueError("OPENAI_API_KEY not found in environment variables")
             self.client = OpenAI(api_key=api_key)
-            self.model = os.environ.get("OPENAI_MODEL", "gpt-4o")
+            self.model = os.environ.get("OPENAI_MODEL", "gpt-5.1")
             
             # Try to import tiktoken for accurate token counting
             try:
@@ -227,7 +227,7 @@ class AnthropicClient(LLMClient):
             if not api_key:
                 raise ValueError("ANTHROPIC_API_KEY not found in environment variables")
             self.client = anthropic.Anthropic(api_key=api_key)
-            self.model = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620")
+            self.model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-5")
         except ImportError:
             print("Error: anthropic package not installed. Run 'pip install anthropic'")
             sys.exit(1)

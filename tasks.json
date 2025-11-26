@@ -1,19 +1,6 @@
 {
   "tasks": [
     {
-      "id": "T-002",
-      "title": "Create a greeting function",
-      "status": "WIP",
-      "assigned": "Dev1",
-      "priority": "Medium",
-      "created": "2025-11-25",
-      "dependencies": [],
-      "description": "Create a simple Python function in utils/greetings.py that takes a name parameter and returns a personalized greeting message",
-      "acceptance_criteria": [],
-      "technical_notes": "",
-      "files_changed": []
-    },
-    {
       "id": "T-001",
       "title": "Setup Project Structure",
       "status": "COMPLETED",
