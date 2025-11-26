@@ -4,7 +4,10 @@ import sys
 import os
 from datetime import datetime
 
-TASKS_FILE = "tasks.json"
+# Dynamic path resolution
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+TASKS_FILE = os.path.join(REPO_ROOT, "tasks.json")
 VALID_STATUSES = ["TODO", "WIP", "TESTING", "REVIEW", "APPROVED", "COMPLETED", "BLOCKED", "REJECTED"]
 VALID_AGENTS = ["Taskmaster", "Dev1", "Dev2", "Testing", "Review", "DevOps", "Unassigned"]
 

@@ -10,8 +10,12 @@ from pathlib import Path
 AGENT_NAME = os.environ.get("AGENT_NAME", "Unknown")
 import tempfile
 NOTIFICATION_FILE = os.path.join(tempfile.gettempdir(), "agent_notifications")
-TASKS_FILE = "/repo/tasks.json"
-TASK_MANAGER = "/repo/scripts/task_manager.py"
+
+# Dynamic path resolution
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+TASKS_FILE = os.path.join(REPO_ROOT, "tasks.json")
+TASK_MANAGER = os.path.join(SCRIPT_DIR, "task_manager.py")
 POLL_INTERVAL = 1  # seconds
 
 def log(message):

@@ -227,7 +227,7 @@ class AnthropicClient(LLMClient):
             if not api_key:
                 raise ValueError("ANTHROPIC_API_KEY not found in environment variables")
             self.client = anthropic.Anthropic(api_key=api_key)
-            self.model = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022")
+            self.model = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620")
         except ImportError:
             print("Error: anthropic package not installed. Run 'pip install anthropic'")
             sys.exit(1)

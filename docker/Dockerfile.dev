@@ -39,6 +39,10 @@ RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir flake8 black
 RUN pip3 install --no-cache-dir chromadb
 
+# Install project requirements
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+
 
 # Install Go - uncomment if needed
 # RUN wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz \

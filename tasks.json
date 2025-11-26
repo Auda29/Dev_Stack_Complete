@@ -3,7 +3,7 @@
     {
       "id": "T-002",
       "title": "Create a greeting function",
-      "status": "TODO",
+      "status": "WIP",
       "assigned": "Dev1",
       "priority": "Medium",
       "created": "2025-11-25",
@@ -63,7 +63,7 @@
     "Add API documentation generator"
   ],
   "metadata": {
-    "last_updated": "2025-11-25",
+    "last_updated": "2025-11-26",
     "maintained_by": "Taskmaster & All Agents"
   }
 }
