@@ -96,31 +96,90 @@ You should see 7 containers:
 
 ## 🎯 Your First AI-Generated Code
 
-### Create a Task
+### Start the Watcher
+
+The watcher monitors `tasks.json` and notifies agents when tasks are added or updated:
 
 ```bash
-python scripts/task_manager.py add \
-  --title "Create a greeting function" \
-  --assigned "Dev1" \
-  --description "Create a Python function that takes a name and returns a personalized greeting"
+# In Terminal 1, start the watcher
+python scripts/watcher.py
+```
+
+**You should see:**
+```
+Starting Watcher for tasks.json...
+Loaded 0 tasks. Monitoring for changes...
+```
+
+> **Keep this running!** The watcher is essential for agents to receive task notifications.
+
+### Start Interactive Taskmaster
+
+Now start the interactive Taskmaster chat interface:
+
+```bash
+# In Terminal 2, start Taskmaster
+python scripts/taskmaster_chat.py
+```
+
+**You'll see:**
+```
+============================================================
+🎯 Taskmaster - AI Project Manager
+============================================================
+
+Welcome! I'm your AI Taskmaster. Tell me what you want to build,
+and I'll break it down into tasks and assign them to the team.
+
+Commands:
+  - Type your request naturally
+  - 'status' - View current tasks
+  - 'help' - Show help
+  - 'quit' or 'exit' - Exit chat
+============================================================
+
+You: 
+```
+
+### Create Your First Task
+
+Just chat naturally with the Taskmaster:
+
+```
+You: Create a greeting function that takes a name and returns a personalized greeting
+
+🎯 Taskmaster: I'll create a task for this simple function:
+
+📝 Creating tasks...
+
+  ✅ Created T-002: Create a greeting function → Dev1
+
+✅ Created 1 task(s). The watcher will notify agents.
 ```
 
 ### Watch the Magic ✨
 
+In a third terminal, watch the Dev1 agent work:
+
 ```bash
-# Watch Dev1 agent work
+# Terminal 3: Watch Dev1 agent
 docker logs -f agent_dev1
 ```
 
 **You'll see:**
 ```
+📨 Received notification: NEW TASK ASSIGNMENT: T-002...
+🎯 Picking up task T-002
 🔍 Searching codebase for relevant context...
-   Found 3 relevant code snippets
+   Found 5 relevant code snippets
 🤖 Querying LLM for implementation...
 ✅ LLM Response received (847 tokens)
 📝 Parsing and applying code changes...
-✅ Successfully applied 1 file changes
+✅ Successfully applied 2 file changes
    - utils/greetings.py
+   - utils/__init__.py
+Auto-reassigning task T-002 to Testing (status: TESTING)
+✓ Task T-002 reassigned to Testing
 ```
 
 ### Check the Result
@@ -133,10 +192,49 @@ cat utils/greetings.py
 ```python
 def greet(name):
     """Return a personalized greeting."""
-    return f"Hello, {name}!"
+    return f"Hello, {name}! Welcome to Dev_Stack!"
 ```
 
-🎉 **Congratulations!** Your AI agent just wrote its first code!
+🎉 **Congratulations!** Your AI agent just wrote its first code, and the task automatically moved to the Testing agent!
+
+### Try Something More Complex
+
+Back in the Taskmaster chat:
+
+```
+You: I need a REST API for managing blog posts with CRUD operations
+
+🎯 Taskmaster: I'll break this down into tasks for the team:
+
+1. Create BlogPost model (Dev1)
+2. Add CRUD endpoints for blog posts (Dev2)
+3. Add tests for blog API (Testing)
+
+📝 Creating tasks...
+
+  ✅ Created T-003: Create BlogPost model → Dev1
+  ✅ Created T-004: Add blog CRUD endpoints → Dev2
+  ✅ Created T-005: Add blog API tests → Testing
+
+✅ Created 3 task(s). The watcher will notify agents.
+
+You: status
+
+📊 Current Tasks
+============================================================
+
+TODO:
+  T-003: Create BlogPost model (Dev1)
+  T-004: Add blog CRUD endpoints (Dev2)
+  T-005: Add blog API tests (Testing)
+
+TESTING:
+  T-002: Create a greeting function (Testing)
+
+============================================================
+```
+
+The agents will automatically work on all assigned tasks in parallel!
 
 ---
 
@@ -415,7 +513,13 @@ python scripts/task_manager.py add \
 ### Essential Commands
 
 ```bash
-# Task management
+# Interactive Taskmaster (recommended)
+python scripts/taskmaster_chat.py
+
+# Watcher (required for task notifications)
+python scripts/watcher.py
+
+# Manual task management
 python scripts/task_manager.py add --title "..." --assigned "Dev1"
 python scripts/task_manager.py list
 python scripts/task_manager.py update T-001 --status COMPLETED

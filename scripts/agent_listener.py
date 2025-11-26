@@ -102,6 +102,38 @@ def determine_next_status(agent_name, current_status):
     return None
 
 
+def reassign_task_by_status(task_id, new_status):
+    """Automatically reassign task to the appropriate agent based on status"""
+    # Status -> Agent mapping
+    status_to_agent = {
+        "TESTING": "Testing",
+        "REVIEW": "Review",
+        "APPROVED": "DevOps"
+    }
+    
+    target_agent = status_to_agent.get(new_status)
+    
+    if target_agent:
+        log(f"Auto-reassigning task {task_id} to {target_agent} (status: {new_status})")
+        try:
+            cmd = [
+                sys.executable,
+                TASK_MANAGER,
+                'update',
+                task_id,
+                '--assigned',
+                target_agent
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            log(f"✓ Task {task_id} reassigned to {target_agent}")
+            return True
+        except subprocess.CalledProcessError as e:
+            log(f"✗ Failed to reassign task: {e.stderr}")
+            return False
+    
+    return False
+
+
 def load_agent_prompt():
     """Load role-specific system prompt for this agent"""
     agent_role = os.environ.get("AGENT_ROLE", "developer")
@@ -328,6 +360,8 @@ def execute_task(task):
             final_status = determine_next_status(AGENT_NAME, "WIP")
             if final_status:
                 update_task_status(task_id, final_status)
+                # Auto-reassign to next agent
+                reassign_task_by_status(task_id, final_status)
         else:
             log(f"⚠️  Task {task_id} execution had errors, keeping in WIP status")
     
@@ -341,6 +375,8 @@ def execute_task(task):
             next_status = determine_next_status(AGENT_NAME, "WIP")
             if next_status:
                 update_task_status(task_id, next_status)
+                # Auto-reassign to next agent
+                reassign_task_by_status(task_id, next_status)
     
     return True
 

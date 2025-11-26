@@ -210,39 +210,90 @@ This creates a vector database of you0r code that agents can query for context.
 
 ## 💼 How It Works
 
-### 1. Chat with Taskmaster
+### 1. Chat with Taskmaster (Interactive Mode)
 
-Instead of manually creating tasks, you chat with the **Taskmaster agent** (via Cursor, ChatGPT, or any LLM interface):
+The easiest way to use Dev_Stack is through the **interactive Taskmaster chat**:
 
-**You say:**
-> "I need user authentication with JWT tokens for login and registration"
+```bash
+# Start the watcher (monitors task changes)
+python scripts/watcher.py
 
-**Taskmaster:**
-- Understands your requirements
-- Breaks them down into atomic tasks
-- Assigns tasks to appropriate agents (Dev1, Dev2, etc.)
-- Uses `task_manager.py` to create tasks in `tasks.json`
+# In another terminal, start Taskmaster chat
+python scripts/taskmaster_chat.py
+```
 
-*Note: You can also create tasks manually using `python scripts/task_manager.py add ...` if preferred.*
+**Then just chat naturally:**
+
+```
+You: I need user authentication with JWT tokens for login and registration
+
+🎯 Taskmaster: I'll break this down into tasks for the team:
+
+1. Create User model and authentication logic (Dev1)
+2. Add JWT token generation and validation (Dev1)
+3. Create login and registration endpoints (Dev2)
+4. Add authentication tests (Testing)
+
+📝 Creating tasks...
+
+  ✅ Created T-003: Create User model → Dev1
+  ✅ Created T-004: Add JWT utilities → Dev1
+  ✅ Created T-005: Create auth endpoints → Dev2
+  ✅ Created T-006: Add auth tests → Testing
+
+✅ Created 4 task(s). The watcher will notify agents.
+```
+
+**Taskmaster Features:**
+- Natural language task creation
+- Intelligent task breakdown
+- Automatic agent assignment
+- Conversation context for follow-ups
+- Status tracking with `status` command
 
 ### 2. Agents Execute Automatically
 
-The Dev1 agent (running Anthropic Claude):
+Once tasks are created, agents work autonomously:
 
-1. **Queries RAG** for similar authentication code
-2. **Builds context** with relevant code snippets
-3. **Generates code** using Claude with full context
-4. **Validates syntax** before applying changes
-5. **Creates files** with automatic backups
-6. **Updates task status** to TESTING
+**Dev1 agent** (running Anthropic Claude):
 
-### 3. Workflow Continues
+1. **Receives notification** from watcher
+2. **Queries RAG** for similar authentication code
+3. **Builds context** with relevant code snippets
+4. **Generates code** using Claude with full context
+5. **Validates syntax** before applying changes
+6. **Creates files** with automatic backups
+7. **Updates task status** to TESTING
+8. **Auto-reassigns** to Testing agent
 
-- **Testing agent** writes and runs tests
-- **Review agent** checks code quality
-- **DevOps agent** merges to main branch
+### 3. Automatic Workflow Progression
 
-All automatically, with full LLM intelligence!
+Tasks automatically flow through the pipeline:
+
+```
+TODO → WIP (Dev1/Dev2 working)
+  ↓
+TESTING (Auto-assigned to Testing agent)
+  ↓
+REVIEW (Auto-assigned to Review agent)
+  ↓
+APPROVED (Auto-assigned to DevOps agent)
+  ↓
+COMPLETED (Merged and done!)
+```
+
+**No manual reassignment needed!** The system handles the entire workflow automatically.
+
+### Alternative: Manual Task Creation
+
+You can also create tasks manually if preferred:
+
+```bash
+python scripts/task_manager.py add \
+  --title "Add user authentication" \
+  --assigned "Dev1" \
+  --description "Implement JWT-based authentication"
+```
 
 ---
 
