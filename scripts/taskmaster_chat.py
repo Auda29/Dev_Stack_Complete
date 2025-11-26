@@ -12,13 +12,13 @@ This script provides an interactive chat interface where users can:
 import os
 import sys
 import json
+import subprocess
 from datetime import datetime
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from llm_client import get_llm_client
-from task_manager import TaskManager
 
 
 class TaskmasterChat:
@@ -27,12 +27,10 @@ class TaskmasterChat:
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.project_root = os.path.dirname(self.base_dir)
         self.tasks_file = os.path.join(self.project_root, "tasks.json")
+        self.task_manager_script = os.path.join(self.base_dir, "task_manager.py")
         
         # Initialize LLM client (using OpenAI for Taskmaster)
         self.llm = get_llm_client(provider="openai")
-        
-        # Initialize task manager
-        self.task_manager = TaskManager(self.tasks_file)
         
         # Conversation history
         self.conversation_history = []
@@ -84,9 +82,22 @@ Be conversational and helpful. Ask clarifying questions if the request is unclea
         print("  - 'quit' or 'exit' - Exit chat")
         print("="*60 + "\n")
 
+    def load_tasks(self):
+        """Load tasks from tasks.json."""
+        if not os.path.exists(self.tasks_file):
+            return []
+        
+        try:
+            with open(self.tasks_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('tasks', [])
+        except Exception as e:
+            print(f"Error loading tasks: {e}")
+            return []
+
     def get_current_tasks_summary(self):
         """Get a summary of current tasks for context."""
-        tasks = self.task_manager.list_tasks()
+        tasks = self.load_tasks()
         
         if not tasks:
             return "No current tasks."
@@ -135,23 +146,51 @@ Be conversational and helpful. Ask clarifying questions if the request is unclea
         
         return tasks_to_create
 
+    def create_task(self, title, assigned, description, priority='Medium', technical_notes=''):
+        """Create a task using task_manager.py."""
+        try:
+            cmd = [
+                sys.executable,
+                self.task_manager_script,
+                'add',
+                '--title', title,
+                '--assigned', assigned,
+                '--description', description,
+                '--priority', priority
+            ]
+            
+            if technical_notes:
+                cmd.extend(['--technical-notes', technical_notes])
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            
+            # Extract task ID from output
+            for line in result.stdout.split('\n'):
+                if 'Created Task' in line:
+                    task_id = line.split()[-1]
+                    return task_id
+            
+            return None
+        except subprocess.CalledProcessError as e:
+            print(f"  ❌ Failed to create task: {e.stderr}")
+            return None
+
     def create_tasks(self, tasks):
         """Create tasks using task_manager."""
         created_tasks = []
         
         for task in tasks:
-            try:
-                task_id = self.task_manager.add_task(
-                    title=task['title'],
-                    assigned=task['assigned'],
-                    description=task['description'],
-                    priority=task['priority'],
-                    technical_notes=task.get('technical_notes', '')
-                )
+            task_id = self.create_task(
+                title=task['title'],
+                assigned=task['assigned'],
+                description=task['description'],
+                priority=task.get('priority', 'Medium'),
+                technical_notes=task.get('technical_notes', '')
+            )
+            
+            if task_id:
                 created_tasks.append(task_id)
                 print(f"  ✅ Created {task_id}: {task['title']} → {task['assigned']}")
-            except Exception as e:
-                print(f"  ❌ Failed to create task '{task['title']}': {e}")
         
         return created_tasks
 
@@ -192,7 +231,7 @@ Be conversational and helpful. Ask clarifying questions if the request is unclea
         print("📊 Current Tasks")
         print("="*60 + "\n")
         
-        tasks = self.task_manager.list_tasks()
+        tasks = self.load_tasks()
         
         if not tasks:
             print("No tasks yet. Tell me what you want to build!\n")
