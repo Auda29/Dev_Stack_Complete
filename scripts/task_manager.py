@@ -74,7 +74,7 @@ def add_task(args):
         "dependencies": args.dependencies.split(',') if args.dependencies else [],
         "description": args.description,
         "acceptance_criteria": [],  # Simplified for CLI, agent can edit later
-        "technical_notes": args.tech_notes,
+        "technical_notes": args.technical_notes,
         "files_changed": []
     }
 
@@ -261,7 +261,7 @@ def main():
     add_parser.add_argument("--priority", default="Medium")
     add_parser.add_argument("--dependencies", help="Comma-separated IDs (e.g. T-001,T-002)")
     add_parser.add_argument("--description", default="")
-    add_parser.add_argument("--tech_notes", default="")
+    add_parser.add_argument("--technical-notes", default="", dest="technical_notes")
 
     # UPDATE
     update_parser = subparsers.add_parser("update", help="Update a task")
