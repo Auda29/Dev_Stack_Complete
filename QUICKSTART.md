@@ -312,10 +312,37 @@ python scripts/task_manager.py add \
 4. Updates status to `APPROVED`
 
 **DevOps Agent** (Anthropic Claude):
-1. Merges to dev branch
-2. Updates status to `COMPLETED`
+1. Creates feature branch: `feature/T-XXX-description`
+2. Integrates approved changes
+3. Pushes feature branch to origin
+4. Updates status to `DONE`
 
-### 3. Monitor Progress
+### 3. Review and Merge Completed Features
+
+When the DevOps agent completes integration, it creates a feature branch for you to review:
+
+**View available feature branches:**
+```bash
+git branch -a | grep feature/
+```
+
+**Review changes:**
+```bash
+git checkout feature/T-001-task-name
+git log
+git diff main
+```
+
+**Merge to main (if approved):**
+```bash
+git checkout main
+git merge feature/T-001-task-name
+git push origin main
+```
+
+**Or create a Pull Request** if using GitHub/GitLab for additional review.
+
+### 4. Monitor Progress
 
 ```bash
 # View all tasks

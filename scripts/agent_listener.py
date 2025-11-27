@@ -207,10 +207,26 @@ As the Review agent, you:
 """,
         "integration_deployment": """
 As the DevOps agent, you:
-- Merge approved branches
-- Resolve merge conflicts
-- Maintain CI/CD pipelines
-- Handle deployments and releases
+- Review and integrate approved code from other agents' worktrees
+- Create a feature branch named: feature/<task-id>-<brief-description>
+  Example: feature/T-001-user-authentication
+- Commit all changes to this feature branch
+- Push the feature branch to origin (NOT main)
+- **NEVER push directly to main**
+- Create a summary of:
+  * What was integrated
+  * Files changed
+  * Any conflicts resolved
+  * Testing status
+- The user will review and merge the feature branch when ready
+
+WORKFLOW:
+1. Collect changes from dev/testing/review worktrees
+2. Create feature branch: git checkout -b feature/T-XXX-description
+3. Commit changes: git add . && git commit -m "Integrate T-XXX: description"
+4. Push feature branch: git push origin feature/T-XXX-description
+5. Update task status to DONE
+6. Add summary to task notes
 """
     }
     
@@ -238,15 +254,14 @@ class ProgressLogger:
     def stop(self):
         self.stop_event.set()
         self.thread.join()
-        sys.stdout.write("\n")
-        sys.stdout.flush()
 
     def _log_progress(self):
+        dot_count = 0
         while not self.stop_event.is_set():
             elapsed = int(time.time() - self.start_time)
-            # Use \r to overwrite the line
-            sys.stdout.write(f"\r[{self.agent_name}] ⏳ Working... ({elapsed}s)")
-            sys.stdout.flush()
+            dots = "." * ((dot_count % 3) + 1)
+            print(f"[{self.agent_name}] ⏳ Working{dots} ({elapsed}s)", flush=True)
+            dot_count += 1
             time.sleep(1)
 
 def execute_work(task):
