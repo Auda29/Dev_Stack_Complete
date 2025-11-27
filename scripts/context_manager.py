@@ -152,6 +152,12 @@ class ContextManager:
             else:
                 break
         
+        # Guarantee at least the most recent non-system message survives trimming
+        if not trimmed_messages and other_messages:
+            preserved_msg = other_messages[-1]
+            trimmed_messages = [preserved_msg]
+            current_tokens = preserved_msg['tokens']
+        
         # Add summary of trimmed messages if any were removed
         if len(trimmed_messages) < len(other_messages):
             removed_count = len(other_messages) - len(trimmed_messages)
@@ -163,6 +169,11 @@ class ContextManager:
             }
             trimmed_messages.insert(0, summary)
             current_tokens += 50
+        
+        # If total tokens still exceed limit, drop newest system messages first
+        while system_messages and (system_tokens + current_tokens) > self.max_tokens:
+            removed = system_messages.pop()  # remove latest system context (e.g., RAG snippet)
+            system_tokens -= removed['tokens']
         
         # Reconstruct messages list
         self.messages = system_messages + trimmed_messages
