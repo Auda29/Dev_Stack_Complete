@@ -223,6 +223,32 @@ from rag_client import RAGClient
 from context_manager import ContextManager
 from code_editor import apply_code_changes
 
+import threading
+
+class ProgressLogger:
+    def __init__(self, agent_name):
+        self.agent_name = agent_name
+        self.stop_event = threading.Event()
+        self.start_time = time.time()
+        self.thread = threading.Thread(target=self._log_progress)
+
+    def start(self):
+        self.thread.start()
+
+    def stop(self):
+        self.stop_event.set()
+        self.thread.join()
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+
+    def _log_progress(self):
+        while not self.stop_event.is_set():
+            elapsed = int(time.time() - self.start_time)
+            # Use \r to overwrite the line
+            sys.stdout.write(f"\r[{self.agent_name}] ⏳ Working... ({elapsed}s)")
+            sys.stdout.flush()
+            time.sleep(1)
+
 def execute_work(task):
     """Execute work on a task using the configured LLM provider with RAG"""
     task_id = task['id']
@@ -301,11 +327,18 @@ Begin your implementation now.
         log("🤖 Querying LLM for implementation...")
         messages = context.get_messages()
         
-        response = llm_client.generate_with_messages(
-            messages=messages,
-            temperature=0.3,  # Lower temperature for more focused code generation
-            max_tokens=4096
-        )
+        # Start progress logger
+        progress = ProgressLogger(AGENT_NAME)
+        progress.start()
+        
+        try:
+            response = llm_client.generate_with_messages(
+                messages=messages,
+                temperature=0.3,  # Lower temperature for more focused code generation
+                max_tokens=4096
+            )
+        finally:
+            progress.stop()
         
         # Track response
         context.add_assistant_message(response, llm_client.last_token_count)
