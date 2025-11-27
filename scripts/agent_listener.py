@@ -389,8 +389,9 @@ def execute_task(task):
     current_status = task['status']
     
     # Determine what status to move to
-    if current_status == "TODO":
-        # Start working: TODO -> WIP
+    # Handle all start statuses: TODO (Dev), TESTING (QA), REVIEW (Review), APPROVED (DevOps)
+    if current_status in ["TODO", "TESTING", "REVIEW", "APPROVED"]:
+        # Start working: STATUS -> WIP
         next_status = "WIP"
         log(f"🎯 Picking up task {task_id}")
         if not update_task_status(task_id, next_status):
