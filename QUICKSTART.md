@@ -18,7 +18,30 @@ python3 --version  # Should show Python 3.8+
 
 ---
 
-## 🚀 5-Minute Setup
+---
+
+## ⚡ Automated Start (Recommended)
+
+After cloning and setting up your environment, you can use the automated session starter:
+
+1. **Clone & Initialize** (see Step 1 below)
+2. **Configure .env** (see Step 3 below)
+3. **Setup Worktrees** (see Step 4 below)
+4. **Run the Starter Script:**
+
+```bash
+python scripts/start_session.py
+```
+
+This script will automatically:
+- Install dependencies
+- Start Docker services
+- Launch the Watcher
+- Launch the Taskmaster Chat
+
+---
+
+## 🚀 Detailed Setup (Manual)
 
 ### Step 1: Clone & Initialize (1 min)
 

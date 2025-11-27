@@ -39,11 +39,22 @@ def read_tasks():
 
 
 def get_my_tasks():
-    """Get tasks assigned to this agent with status TODO or WIP"""
+    """Get tasks assigned to this agent with appropriate status"""
     tasks = read_tasks()
+    
+    # Define valid start statuses for each agent
+    valid_statuses = ['TODO', 'WIP']
+    
+    if AGENT_NAME == "Testing":
+        valid_statuses.append("TESTING")
+    elif AGENT_NAME == "Review":
+        valid_statuses.append("REVIEW")
+    elif AGENT_NAME == "DevOps":
+        valid_statuses.append("APPROVED")
+        
     my_tasks = [
         task for task in tasks
-        if task.get('assigned') == AGENT_NAME and task.get('status') in ['TODO', 'WIP']
+        if task.get('assigned') == AGENT_NAME and task.get('status') in valid_statuses
     ]
     return my_tasks
 
