@@ -383,11 +383,24 @@ Begin your implementation now.
         log("📝 Parsing and applying code changes...")
         results = apply_code_changes(response, workspace_root=os.getcwd())
         
-        if results['success_count'] > 0:
-            log(f"✅ Successfully applied {results['success_count']} file changes")
+        success_count = results.get('success_count', 0)
+        failure_count = results.get('failure_count', 0)
+        message = results.get('message')
         
-        if results['failure_count'] > 0:
-            log(f"⚠️  {results['failure_count']} file changes failed")
+        if message:
+            log(f"ℹ️  {message}")
+        
+        if success_count > 0:
+            log(f"✅ Successfully applied {success_count} file change(s)")
+        else:
+            log("⚠️  No file changes were applied from the LLM response")
+        
+        if failure_count > 0:
+            log(f"❌ {failure_count} file change(s) failed during application")
+        
+        # Treat runs without code changes as failures so tasks don't advance
+        if success_count == 0 or failure_count > 0:
+            return False
         
         return True
         
