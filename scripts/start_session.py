@@ -6,8 +6,9 @@ This script automates the setup and launch of the Dev_Stack environment:
 1. Checks for .env file
 2. Installs Python dependencies
 3. Starts Docker services
-4. Launches the Watcher in a new terminal
-5. Launches the Taskmaster Chat in the current terminal
+5. Indexes the codebase for RAG
+6. Launches the Watcher in a new terminal
+7. Launches the Taskmaster Chat in the current terminal
 """
 
 import os
@@ -17,7 +18,7 @@ import time
 import platform
 
 def print_step(step, message):
-    print(f"\n[{step}/5] {message}...")
+    print(f"\n[{step}/6] {message}...")
 
 def check_env_file():
     print_step(1, "Checking environment configuration")
@@ -46,8 +47,26 @@ def start_docker():
         print("Please ensure Docker Desktop is running.")
         sys.exit(1)
 
+def index_codebase():
+    print_step(4, "Indexing codebase (RAG)")
+    
+    embed_script = os.path.join("scripts", "embed_codebase.py")
+    if not os.path.exists(embed_script):
+        print(f"⚠️  Warning: {embed_script} not found! Skipping indexing.")
+        return
+
+    print("Waiting for ChromaDB to be ready...")
+    time.sleep(5)  # Give Chroma a moment to start accepting connections
+    
+    try:
+        subprocess.check_call([sys.executable, embed_script])
+        print("✅ Codebase indexed")
+    except subprocess.CalledProcessError:
+        print("⚠️  Failed to index codebase. RAG features might be limited.")
+        print("You can try running 'python scripts/embed_codebase.py' manually later.")
+
 def launch_watcher():
-    print_step(4, "Launching Watcher")
+    print_step(5, "Launching Watcher")
     
     watcher_script = os.path.join("scripts", "watcher.py")
     if not os.path.exists(watcher_script):
@@ -90,7 +109,7 @@ def launch_watcher():
         print("Please run 'python scripts/watcher.py' in a separate terminal.")
 
 def launch_taskmaster():
-    print_step(5, "Launching Taskmaster")
+    print_step(6, "Launching Taskmaster")
     
     taskmaster_script = os.path.join("scripts", "taskmaster_chat.py")
     if not os.path.exists(taskmaster_script):
@@ -116,6 +135,7 @@ def main():
     check_env_file()
     install_dependencies()
     start_docker()
+    index_codebase()
     launch_watcher()
     launch_taskmaster()
 
