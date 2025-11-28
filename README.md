@@ -208,6 +208,63 @@ This creates a vector database of you0r code that agents can query for context.
 
 ---
 
+## 📁 Where is the Generated Code?
+
+> **⚠️ IMPORTANT**: Agents create code in **worktrees**, not in your main repository directory!
+
+Each agent works in an isolated Git worktree to prevent merge conflicts:
+
+```bash
+# Agent: Dev1
+.worktrees/dev1/src/         # ← Dev1's generated code here
+.worktrees/dev1/tests/       # ← Tests here
+.worktrees/dev1/work_artifacts/  # ← LLM responses
+
+# Agent: Dev2
+.worktrees/dev2/src/         # ← Dev2's code
+
+# Agent: Testing
+.worktrees/testing/tests/    # ← Generated tests
+```
+
+### Viewing Generated Code
+
+```bash
+# View all Python files created by agents
+Get-ChildItem -Path .worktrees -Recurse -Filter "*.py"
+
+# Check Dev1's code
+ls .worktrees/dev1/src/
+
+# View a specific file
+cat .worktrees/dev1/src/core/greeting.py
+
+# See LLM responses
+cat .worktrees/dev1/work_artifacts/T-002_response.md
+```
+
+### Feature Branch Integration
+
+When tasks are **APPROVED**, the DevOps agent creates a feature branch:
+
+```bash
+# DevOps automatically creates:
+feature/t-002-personalized-greeting
+
+# You can also manually integrate:
+python scripts/devops_git_integration.py T-002 .worktrees/dev1
+```
+
+**Workflow**:
+1. Dev1 creates code → `.worktrees/dev1/`
+2. Task moves through pipeline → TESTING → REVIEW → APPROVED
+3. DevOps creates feature branch → `feature/t-xxx-description`
+4. **You review and merge** the feature branch
+
+**See**: [docs/devops_integration.md](docs/devops_integration.md) for details
+
+---
+
 ## 💼 How It Works
 
 ### 1. Chat with Taskmaster (Interactive Mode)
@@ -375,6 +432,7 @@ work_artifacts/contexts/
 - **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
 - **[docs/cursor_integration.md](docs/cursor_integration.md)** - Chat with Taskmaster via Cursor/LLM
 - **[docs/llm_integration.md](docs/llm_integration.md)** - Complete LLM integration guide
+- **[docs/devops_integration.md](docs/devops_integration.md)** - Feature branch workflow
 - **[docs/agents.md](docs/agents.md)** - Detailed agent roles and workflows
 - **[docs/architecture_decisions.md](docs/architecture_decisions.md)** - Design decisions
 
@@ -513,6 +571,11 @@ docker logs -f agent_dev1
 ### Check Results
 
 ```bash
+# Code is in worktrees, not main repo!
+cat .worktrees/dev1/auth/reset_password.py
+
+# Or check the feature branch after DevOps integration
+git checkout feature/t-xxx-password-reset
 cat auth/reset_password.py
 ```
 

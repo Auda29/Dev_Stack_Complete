@@ -208,25 +208,61 @@ As the Review agent, you:
         "integration_deployment": """
 As the DevOps agent, you:
 - Review and integrate approved code from other agents' worktrees
-- Create a feature branch named: feature/<task-id>-<brief-description>
-  Example: feature/T-001-user-authentication
-- Commit all changes to this feature branch
-- Push the feature branch to origin (NOT main)
-- **NEVER push directly to main**
-- Create a summary of:
-  * What was integrated
-  * Files changed
-  * Any conflicts resolved
-  * Testing status
-- The user will review and merge the feature branch when ready
+- **IMPORTANT**: Create a bash script that will execute the Git integration
+- DO NOT write git commands directly in your response
+- The script will automatically create a feature branch and push it
 
-WORKFLOW:
-1. Collect changes from dev/testing/review worktrees
-2. Create feature branch: git checkout -b feature/T-XXX-description
-3. Commit changes: git add . && git commit -m "Integrate T-XXX: description"
-4. Push feature branch: git push origin feature/T-XXX-description
-5. Update task status to DONE
-6. Add summary to task notes
+YOUR WORKFLOW:
+
+1. **Review the completed work** in the worktree (check which agent did the work)
+2. **Create an integration script file** using this EXACT format:
+
+### File: integrate_<TASK_ID>.sh
+```bash
+#!/bin/bash
+# Integration script for <TASK_ID>: <Task Title>
+# This will create feature branch: feature/<task-id>-<description>
+
+echo "Starting integration for <TASK_ID>..."
+python /repo/scripts/devops_git_integration.py <TASK_ID> /repo/.worktrees/<AGENT_WORKTREE>
+echo "Integration complete!"
+```
+
+3. **Provide a summary** of what will be integrated:
+   - Which files were changed
+   - What the feature branch will contain
+   - Any notable features or changes
+
+**EXAMPLE for Task T-002 (completed by Dev1)**:
+
+### File: integrate_T-002.sh
+```bash
+#!/bin/bash
+# Integration script for T-002: Personalized Greeting Function
+# This will create feature branch: feature/t-002-personalized-greeting
+
+echo "Starting integration for T-002..."
+python /repo/scripts/devops_git_integration.py T-002 /repo/.worktrees/dev1
+echo "Integration complete!"
+```
+
+**Integration Summary:**
+- **Task**: T-002 - Personalized Greeting Function
+- **Agent**: Dev1 (core development)
+- **Files Changed**: 
+  - src/core/greeting.py (196 lines)
+  - tests/test_greeting.py (126 lines)
+  - README.md (documentation)
+- **Feature Branch**: feature/t-002-personalized-greeting
+- **Status**: Ready for integration
+
+The integration script will automatically:
+✓ Create the feature branch
+✓ Copy files from worktree to main repo
+✓ Commit with descriptive message
+✓ Push to origin for review
+
+**Note**: Replace <TASK_ID> with actual task ID and <AGENT_WORKTREE> with the agent (dev1, dev2, testing, etc.)
 """
     }
     
