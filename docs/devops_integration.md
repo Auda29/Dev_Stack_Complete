@@ -1,15 +1,12 @@
 # DevOps Feature Branch Integration
 
-## Overview
-
-The DevOps agent now automatically creates feature branches for completed tasks.
-
-##  How It Works
+## How It Works
 
 1. **DevOps Agent** reviews approved code in worktrees
 2. **Creates integration script** (e.g., `integrate_T-002.sh`)
 3. **Git integration script** copies files and creates feature branch
 4. **Pushes to origin** for review
+5. **Automatically fetches** so your local repo knows about the new branch
 
 ## Manual Integration
 
@@ -42,6 +39,36 @@ ls .worktrees/testing/tests/
 
 # All Python files created
 Get-ChildItem -Path .worktrees -Recurse -Filter "*.py"
+```
+
+## Automatic Branch Syncing
+
+The integration script automatically runs `git fetch` after pushing, so your local repository immediately knows about new feature branches.
+
+**To manually fetch at any time**:
+```bash
+git fetch origin
+```
+
+**To automatically sync in the background** (optional):
+```bash
+# Fetch every 60 seconds
+python scripts/branch_sync.py
+
+# Or fetch once
+python scripts/branch_sync.py --once
+```
+
+**Checking out a feature branch**:
+```bash
+# List available feature branches
+git branch -r --list "origin/feature/*"
+
+# Check out a specific branch
+git checkout feature/t-002-personalized-greeting
+
+# Or create local tracking branch
+git checkout -b feature/t-002-personalized-greeting origin/feature/t-002-personalized-greeting
 ```
 
 ## Feature Branch Workflow

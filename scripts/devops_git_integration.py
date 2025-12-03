@@ -191,7 +191,14 @@ def create_feature_branch(task_id, task_title, worktree_path, main_repo_path):
     print(f"✅ Pushed to origin/{branch_name}")
     print()
     
-    # Step 7: Create summary
+    # Step 7: Fetch in main repo so local knows about new branch
+    print(f"🔄 Step 7: Updating local repository...")
+    success, output = run_git_command("git fetch origin", cwd=main_repo_path)
+    if success:
+        print(f"✅ Local repository updated with remote branches")
+    print()
+    
+    # Step 8: Create summary
     summary = f"""
 {'='*60}
 DevOps Integration Complete
@@ -201,11 +208,13 @@ DevOps Integration Complete
 🌿 Branch: {branch_name}
 📁 Files changed: {len(changed_files)}
 🚀 Status: Pushed to origin
+🔄 Local repo: Updated
 
 Next Steps:
-1. Review the feature branch: git checkout {branch_name}
-2. Create a pull request if using GitHub/GitLab
-3. Merge when ready: git merge {branch_name}
+1. Switch to feature branch: git checkout {branch_name}
+2. Review the changes
+3. Create a pull request if using GitHub/GitLab
+4. Merge when ready: git merge {branch_name}
 
 {'='*60}
 """
