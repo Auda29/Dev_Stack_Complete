@@ -207,8 +207,13 @@ Auto-reassigning task T-002 to Testing (status: TESTING)
 
 ### Check the Result
 
+> **⚠️ IMPORTANT**: Agents create code in **worktrees**, not your main directory!
+
+Each agent works in an isolated Git worktree:
+
 ```bash
-cat utils/greetings.py
+# Code is in the agent's worktree
+cat .worktrees/dev1/utils/greetings.py
 ```
 
 **The AI wrote this:**
@@ -218,7 +223,41 @@ def greet(name):
     return f"Hello, {name}! Welcome to Dev_Stack!"
 ```
 
-🎉 **Congratulations!** Your AI agent just wrote its first code, and the task automatically moved to the Testing agent!
+🎉 **Congratulations!** Your AI agent just wrote its first code!
+
+**Where to find generated code:**
+```bash
+# Dev1's code
+ls .worktrees/dev1/
+
+# Testing's code
+ls .worktrees/testing/
+
+# All Python files created by agents
+Get-ChildItem -Path .worktrees -Recurse -Filter "*.py"  # PowerShell
+find .worktrees -name "*.py"  # Bash
+```
+
+### How the Feature Branch Workflow Works
+
+When tasks complete the full pipeline (DEV → TESTING → REVIEW → APPROVED), the DevOps agent automatically:
+
+1. **Creates an integration script** (e.g., `integrate_T-002.sh`)
+2. **Runs the script** to create a feature branch
+3. **Copies code** from worktrees to the feature branch  
+4. **Pushes to origin** for your review
+
+**Check for feature branches:**
+```bash
+# List all feature branches
+git branch -r --list "origin/feature/*"
+
+# Check out a feature branch
+git checkout feature/t-002-greeting-function
+
+# Now the code is in your main repo!
+cat utils/greetings.py
+```
 
 ### Try Something More Complex
 
@@ -312,24 +351,41 @@ python scripts/task_manager.py add \
 4. Updates status to `APPROVED`
 
 **DevOps Agent** (Anthropic Claude):
-1. Creates feature branch: `feature/T-XXX-description`
-2. Integrates approved changes
-3. Pushes feature branch to origin
-4. Updates status to `DONE`
+1. Creates integration script: `integrate_T-XXX.sh`
+2. Script runs `devops_git_integration.py`
+3. Creates feature branch: `feature/T-XXX-description`
+4. Copies code from worktree to branch
+5. Pushes feature branch to origin
+6. Updates status to `COMPLETED`
 
 ### 3. Review and Merge Completed Features
 
-When the DevOps agent completes integration, it creates a feature branch for you to review:
+When the DevOps agent completes integration, it creates a feature branch:
 
 **View available feature branches:**
 ```bash
-git branch -a | grep feature/
+# Local branches
+git branch --list "feature/*"
+
+# Remote branches (pushed by DevOps)
+git branch -r --list "origin/feature/*"
 ```
 
 **Review changes:**
 ```bash
+# Fetch latest from DevOps
+git fetch origin
+
+# Check out the feature branch
 git checkout feature/T-001-task-name
+
+# Review the code (now in main repo, not worktrees!)
+cat src/module.py
+
+# View commits
 git log
+
+# Compare to main
 git diff main
 ```
 
