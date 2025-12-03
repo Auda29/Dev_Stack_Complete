@@ -208,61 +208,60 @@ As the Review agent, you:
         "integration_deployment": """
 As the DevOps agent, you:
 - Review and integrate approved code from other agents' worktrees
-- **IMPORTANT**: Create a bash script that will execute the Git integration
-- DO NOT write git commands directly in your response
+- **CRITICAL**: Create a bash integration script (NOT code files!)
 - The script will automatically create a feature branch and push it
 
 YOUR WORKFLOW:
 
-1. **Review the completed work** in the worktree (check which agent did the work)
-2. **Create an integration script file** using this EXACT format:
+1. **Identify which worktree has the code**:
+   - Check the task to see which agent it was ORIGINALLY assigned to
+   - Use this mapping:
+     * Dev1 → `/repo/.worktrees/dev1`
+     * Dev2 → `/repo/.worktrees/dev2`
+     * Testing → `/repo/.worktrees/testing`
+   - Even though task comes to you as DevOps, the CODE is in the original agent's worktree!
+
+2. **Create an integration script** using this EXACT format:
 
 ### File: integrate_<TASK_ID>.sh
 ```bash
 #!/bin/bash
-# Integration script for <TASK_ID>: <Task Title>
-# This will create feature branch: feature/<task-id>-<description>
-
-echo "Starting integration for <TASK_ID>..."
-python /repo/scripts/devops_git_integration.py <TASK_ID> /repo/.worktrees/<AGENT_WORKTREE>
-echo "Integration complete!"
+# Integration for <TASK_ID>: <Task Title>
+python /repo/scripts/devops_git_integration.py <TASK_ID> /repo/.worktrees/<ORIGINAL_AGENT_WORKTREE>
 ```
 
-3. **Provide a summary** of what will be integrated:
-   - Which files were changed
-   - What the feature branch will contain
-   - Any notable features or changes
+3. **Provide a summary** of what will be integrated
 
-**EXAMPLE for Task T-002 (completed by Dev1)**:
+**DECISION TREE - Which Worktree?**
+```
+Task originally assigned to Dev1? → Use /repo/.worktrees/dev1
+Task originally assigned to Dev2? → Use /repo/.worktrees/dev2
+Task went through Testing? → Code is STILL in dev1 or dev2 (not testing)
+Task description mentions "core logic"? → Probably dev1
+Task description mentions "API/integration"? → Probably dev2
+```
+
+**CORRECT EXAMPLE - Task T-002 originally assigned to Dev1**:
 
 ### File: integrate_T-002.sh
 ```bash
 #!/bin/bash
-# Integration script for T-002: Personalized Greeting Function
-# This will create feature branch: feature/t-002-personalized-greeting
-
-echo "Starting integration for T-002..."
+# Integration for T-002: Personalized Greeting Function
+# Dev1 created the code, so use dev1 worktree
 python /repo/scripts/devops_git_integration.py T-002 /repo/.worktrees/dev1
-echo "Integration complete!"
 ```
 
-**Integration Summary:**
-- **Task**: T-002 - Personalized Greeting Function
-- **Agent**: Dev1 (core development)
-- **Files Changed**: 
-  - src/core/greeting.py (196 lines)
-  - tests/test_greeting.py (126 lines)
-  - README.md (documentation)
-- **Feature Branch**: feature/t-002-personalized-greeting
-- **Status**: Ready for integration
+**Summary**: Task T-002 - Personalized greeting function. Code in dev1 worktree: src/core/greeting.py, tests/test_greeting.py
 
-The integration script will automatically:
-✓ Create the feature branch
-✓ Copy files from worktree to main repo
-✓ Commit with descriptive message
-✓ Push to origin for review
+**WRONG - Do NOT do this**:
+❌ Creating greeting.py yourself - You create the SCRIPT, not the code!
+❌ Using /repo/.worktrees/devops - Code is in dev1/dev2, not devops!
+❌ Writing git commands directly - Use the integration script!
 
-**Note**: Replace <TASK_ID> with actual task ID and <AGENT_WORKTREE> with the agent (dev1, dev2, testing, etc.)
+**Remember**: 
+- You create the INTEGRATION SCRIPT (integrate_*.sh)
+- NOT the actual code files
+- Script points to the ORIGINAL agent's worktree (dev1/dev2)
 """
     }
     

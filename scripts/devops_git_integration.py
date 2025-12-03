@@ -36,9 +36,17 @@ def get_task_info(task_id):
     try:
         with open(tasks_file, 'r') as f:
             data = json.load(f)
+            
+            # Check active tasks
             for task in data.get('tasks', []):
                 if task['id'] == task_id:
                     return task
+            
+            # Check completed tasks (if stored separately)
+            for task in data.get('completed_tasks', []):
+                if task['id'] == task_id:
+                    return task
+                    
     except Exception as e:
         print(f"Error loading task info: {e}")
     
