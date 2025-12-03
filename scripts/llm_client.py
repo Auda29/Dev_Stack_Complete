@@ -93,7 +93,7 @@ class OpenAIClient(LLMClient):
             if not api_key:
                 raise ValueError("OPENAI_API_KEY not found in environment variables")
             self.client = OpenAI(api_key=api_key)
-            self.model = os.environ.get("OPENAI_MODEL", "gpt-5.1")
+            self.model = os.environ.get("OPENAI_MODEL", "gpt-4o")
             
             # Try to import tiktoken for accurate token counting
             try:
