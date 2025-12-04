@@ -24,26 +24,6 @@
 
 ## Active Tasks
 
-### T-002: Develop Personalized Greeting Function
-
-**Status**: COMPLETED
-**Assigned**: DevOps
-**Priority**: Medium
-**Created**: 2025-12-03
-**Dependencies**: None
-
-**Description**:
-Create a function that accepts a name as input and returns a personalized greeting. The function should handle typical edge cases, such as empty strings or non-string inputs, gracefully.
-
-**Acceptance Criteria**:
-
-**Technical Notes**:
-Consider using string formatting techniques to insert the name into the greeting message. Ensure the function is well-documented and includes unit tests to verify its correctness.
-
-**Files Changed**:
-
----
-
 ### T-001: Setup Project Structure
 
 **Status**: COMPLETED
