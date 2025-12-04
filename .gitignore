@@ -1,6 +1,7 @@
 # Dev_Stack .gitignore
 
 # Worktrees (managed by Git, but ignore any temp files)
+.worktrees/
 .worktrees/**/node_modules/
 .worktrees/**/.env
 .worktrees/**/.env.local
