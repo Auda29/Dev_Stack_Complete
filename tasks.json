@@ -1,25 +1,3 @@
-{
-  "tasks": [
-    {
-      "id": "T-002",
-      "title": "Develop Personalized Greeting Function",
-      "status": "COMPLETED",
-      "assigned": "DevOps",
-      "priority": "Medium",
-      "created": "2025-12-03",
-      "dependencies": [],
-      "description": "Create a function that accepts a name as input and returns a personalized greeting. The function should handle typical edge cases, such as empty strings or non-string inputs, gracefully.",
-      "acceptance_criteria": [],
-      "technical_notes": "Consider using string formatting techniques to insert the name into the greeting message. Ensure the function is well-documented and includes unit tests to verify its correctness.",
-      "files_changed": []
-    },
-    {
-      "id": "T-001",
-      "title": "Setup Project Structure",
-      "status": "COMPLETED",
-      "assigned": "DevOps",
-      "priority": "High",
-      "created": "2025-11-07",
       "completed": "2025-11-07",
       "dependencies": [],
       "description": "Initialize the project with proper folder structure, documentation, and Docker setup.",
