@@ -24,6 +24,26 @@
 
 ## Active Tasks
 
+### T-002: Develop Personalized Greeting Function
+
+**Status**: COMPLETED
+**Assigned**: DevOps
+**Priority**: Medium
+**Created**: 2025-12-04
+**Dependencies**: None
+
+**Description**:
+Create a function that takes a name as input and returns a personalized greeting. The function should handle different name inputs gracefully and return a friendly message like "Hello, [Name]! Welcome back!".
+
+**Acceptance Criteria**:
+
+**Technical Notes**:
+Consider edge cases such as empty strings or non-string inputs. The function should be simple and efficient.
+
+**Files Changed**:
+
+---
+
 ### T-001: Setup Project Structure
 
 **Status**: COMPLETED
@@ -74,5 +94,5 @@ Ideas and future tasks that are not yet scheduled:
 
 ---
 
-**Last Updated**: 2025-12-03
+**Last Updated**: 2025-12-04
 **Maintained By**: Taskmaster & All Agents

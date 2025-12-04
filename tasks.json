@@ -1,6 +1,19 @@
 {
   "tasks": [
     {
+      "id": "T-002",
+      "title": "Develop Personalized Greeting Function",
+      "status": "COMPLETED",
+      "assigned": "DevOps",
+      "priority": "Medium",
+      "created": "2025-12-04",
+      "dependencies": [],
+      "description": "Create a function that takes a name as input and returns a personalized greeting. The function should handle different name inputs gracefully and return a friendly message like \"Hello, [Name]! Welcome back!\".",
+      "acceptance_criteria": [],
+      "technical_notes": "Consider edge cases such as empty strings or non-string inputs. The function should be simple and efficient.",
+      "files_changed": []
+    },
+    {
       "id": "T-001",
       "title": "Setup Project Structure",
       "status": "COMPLETED",
@@ -50,7 +63,7 @@
     "Add API documentation generator"
   ],
   "metadata": {
-    "last_updated": "2025-11-26",
+    "last_updated": "2025-12-04",
     "maintained_by": "Taskmaster & All Agents"
   }
 }
