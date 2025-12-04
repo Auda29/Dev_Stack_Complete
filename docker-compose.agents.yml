@@ -11,6 +11,7 @@ services:
     hostname: taskmaster
     volumes:
       - .:/repo
+    user: root
     working_dir: /repo/.worktrees/devops
     environment:
       - AGENT_NAME=Taskmaster
@@ -36,6 +37,7 @@ services:
     hostname: dev1
     volumes:
       - .:/repo
+    user: root
     working_dir: /repo/.worktrees/dev1
     environment:
       - AGENT_NAME=Dev1
@@ -62,6 +64,7 @@ services:
     hostname: dev2
     volumes:
       - .:/repo
+    user: root
     working_dir: /repo/.worktrees/dev2
     environment:
       - AGENT_NAME=Dev2
@@ -88,6 +91,7 @@ services:
     hostname: testing
     volumes:
       - .:/repo
+    user: root
     working_dir: /repo/.worktrees/testing
     environment:
       - AGENT_NAME=Testing
@@ -114,6 +118,7 @@ services:
     hostname: review
     volumes:
       - .:/repo
+    user: root
     working_dir: /repo/.worktrees/review
     environment:
       - AGENT_NAME=Review
@@ -139,6 +144,7 @@ services:
     hostname: devops
     volumes:
       - .:/repo
+    user: root
     working_dir: /repo/.worktrees/devops
     environment:
       - AGENT_NAME=DevOps
