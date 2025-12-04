@@ -29,16 +29,16 @@
 **Status**: COMPLETED
 **Assigned**: DevOps
 **Priority**: Medium
-**Created**: 2025-12-04
+**Created**: 2025-12-03
 **Dependencies**: None
 
 **Description**:
-Create a function that takes a name as input and returns a personalized greeting. The function should handle different name inputs gracefully and return a friendly message like "Hello, [Name]! Welcome back!".
+Create a function that accepts a name as input and returns a personalized greeting. The function should handle typical edge cases, such as empty strings or non-string inputs, gracefully.
 
 **Acceptance Criteria**:
 
 **Technical Notes**:
-Consider edge cases such as empty strings or non-string inputs. The function should be simple and efficient.
+Consider using string formatting techniques to insert the name into the greeting message. Ensure the function is well-documented and includes unit tests to verify its correctness.
 
 **Files Changed**:
 

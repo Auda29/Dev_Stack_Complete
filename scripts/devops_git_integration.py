@@ -36,17 +36,9 @@ def get_task_info(task_id):
     try:
         with open(tasks_file, 'r') as f:
             data = json.load(f)
-            
-            # Check active tasks
             for task in data.get('tasks', []):
                 if task['id'] == task_id:
                     return task
-            
-            # Check completed tasks (if stored separately)
-            for task in data.get('completed_tasks', []):
-                if task['id'] == task_id:
-                    return task
-                    
     except Exception as e:
         print(f"Error loading task info: {e}")
     
@@ -90,8 +82,13 @@ def create_feature_branch(task_id, task_title, worktree_path, main_repo_path):
         return False, f"Failed to check git status: {output}"
     
     if not output:
-        print("⚠️  No changes detected in worktree")
-        return False, "No changes to commit"
+        # Check for committed changes ahead of origin/dev
+        success, output = run_git_command("git diff --name-only origin/dev HEAD", cwd=worktree_path)
+        if not output:
+            print("⚠️  No changes detected in worktree (staged, unstaged, or committed)")
+            return False, "No changes to commit"
+        else:
+            print("✅ Found committed changes ahead of origin/dev")
     
     changed_files = output.split('\n')
     print(f"✅ Found {len(changed_files)} changed file(s):\n")
@@ -124,9 +121,9 @@ def create_feature_branch(task_id, task_title, worktree_path, main_repo_path):
     # Step 3: Copy files from worktree to main repo
     print("📋 Step 3: Copying changes from worktree to main repo...")
     
-    # Get list of modified/added files (excluding deleted)
+    # Get list of modified/added files (comparing against origin/dev to catch commits)
     success, output = run_git_command(
-        "git diff --name-only HEAD",
+        "git diff --name-only origin/dev HEAD",
         cwd=worktree_path
     )
     
