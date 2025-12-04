@@ -13,22 +13,6 @@ if (-not (Test-Path ".git")) {
     exit 1
 }
 
-# Configuration
-$WorktreeBase = ".worktrees"
-$Agents = @(
-    @{ Name = "devops"; Branch = "chore/devops" },
-    @{ Name = "dev1"; Branch = "agent/dev1" },
-    @{ Name = "dev2"; Branch = "agent/dev2" },
-    @{ Name = "testing"; Branch = "test/testing" },
-    @{ Name = "review"; Branch = "review/main" }
-)
-
-# Create worktree base directory if it doesn't exist
-if (-not (Test-Path $WorktreeBase)) {
-    Write-Host "Creating worktree base directory: $WorktreeBase" -ForegroundColor Yellow
-    New-Item -ItemType Directory -Path $WorktreeBase | Out-Null
-}
-
 # Ensure we're on a valid branch
 $CurrentBranch = git branch --show-current
 if ([string]::IsNullOrWhiteSpace($CurrentBranch)) {
