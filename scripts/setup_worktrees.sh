@@ -63,15 +63,23 @@ for AGENT_CONFIG in "${AGENTS[@]}"; do
     echo "Branch: $BRANCH"
     echo "Path: $WORKTREE_PATH"
     
-    # Check if worktree already exists
+    # Check if worktree directory already exists
     if [ -d "$WORKTREE_PATH" ]; then
-        echo "⚠ Worktree already exists, skipping..."
-        continue
+        # Check if it's a valid worktree (must contain .git file)
+        if [ -f "$WORKTREE_PATH/.git" ]; then
+            echo "✓ Worktree already exists and is valid, skipping..."
+            continue
+        else
+            echo "⚠ Directory exists but is NOT a valid worktree!"
+            echo "  Backing up to ${WORKTREE_PATH}_backup..."
+            mv "$WORKTREE_PATH" "${WORKTREE_PATH}_backup"
+            echo "  Recreating worktree..."
+        fi
     fi
     
     # Check if branch exists
     if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
-        echo "✓ Branch exists"
+        echo "✓ Branch exists: $BRANCH"
     else
         echo "Creating branch: $BRANCH"
         git branch "$BRANCH" dev

@@ -92,8 +92,11 @@ OPENAI_MODEL=gpt-4o
 ### Step 4: Setup Worktrees (1 min)
 
 ```bash
-# Create Git worktrees for each agent
+# Bash (Linux/Mac/Git Bash)
 bash scripts/setup_worktrees.sh
+
+# PowerShell (Windows)
+.\scripts\setup_worktrees.ps1
 ```
 
 ### Step 5: Start the System (30 sec)
