@@ -123,7 +123,7 @@ def create_feature_branch(task_id, task_title, worktree_path, main_repo_path):
     
     # Get list of modified/added files (comparing against origin/dev to catch commits)
     success, output = run_git_command(
-        "git diff --name-only origin/dev HEAD",
+        "git diff --name-only origin/dev...HEAD",
         cwd=worktree_path
     )
     
